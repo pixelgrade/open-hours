@@ -65,6 +65,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		$instance['title']      = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['open_note']  = ( ! empty( $new_instance['open_note'] ) ) ? strip_tags( $new_instance['open_note'] ) : '';
 		$instance['close_note'] = ( ! empty( $new_instance['close_note'] ) ) ? strip_tags( $new_instance['close_note'] ) : '';
+		$instance['widget_id']  = $this->getWidgetId();
 
 		return $instance;
 	}

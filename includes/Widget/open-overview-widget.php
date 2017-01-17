@@ -89,6 +89,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : '';
 		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
 		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? strip_tags( $new_instance['short_day_name'] ) : '';
+		$instance['widget_id']  = $this->getWidgetId();
 
 		return $instance;
 	}

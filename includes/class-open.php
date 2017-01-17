@@ -20,6 +20,7 @@ class OpenPlugin {
 	 */
 	protected $plugin_version;
 
+	private $widget_ids = array();
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -44,7 +45,31 @@ class OpenPlugin {
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 		add_action( 'customize_register', array( $this, 'open_customizer_register' ) );
 		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
+	}
 
+	/**
+	 * Enqueue control scripts
+	 */
+	public function enqueue_customizer_control_scripts() {
+
+		wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
+			'jquery',
+			'wp-util'
+		), $this->plugin_version, true );
+		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+	}
+
+	/**
+	 * Enqueue live preview scripts
+	 */
+	public function enqueue_customizer_preview_scripts() {
+		wp_enqueue_script( 'open-customizer-preview', plugin_dir_url( __FILE__ ) . 'js/open-customizer-preview.js', array(
+			'jquery',
+			'wp-util'
+		), $this->plugin_version, true );
+		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+
+		$this->localize_js_data();
 	}
 
 	/**
@@ -102,30 +127,6 @@ class OpenPlugin {
 	}
 
 	/**
-	 * Enqueue control scripts
-	 */
-	public function enqueue_customizer_control_scripts() {
-
-		wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
-			'jquery',
-			'wp-util'
-		), $this->plugin_version, true );
-		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
-	}
-
-	/**
-	 * Enqueue live preview scripts
-	 */
-	public function enqueue_customizer_preview_scripts() {
-		wp_enqueue_script( 'open-customizer-preview', plugin_dir_url( __FILE__ ) . 'js/open-customizer-preview.js', array(
-			'jquery',
-			'wp-util'
-		), $this->plugin_version, true );
-		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
-
-	}
-
-	/**
 	 * Register the Open Current Status Widget
 	 */
 
@@ -170,14 +171,31 @@ class OpenPlugin {
 				$widget_type = '';
 		}
 
+		// Set the transport to be postMessage
 		for ( $i = 0; $i <= $widget_number; $i ++ ) {
 			$widget_id       = 'open_' . $widget_type . '_widget-' . $i;
 			$customizer_id   = $manager->get_setting_id( $widget_id );
+			// push to localized widget_ids array
+			array_push($this->widget_ids, $widget_id);
+
 			$widget_settings = $wp_customize->get_setting( $customizer_id );
 
 			if ( $widget_settings ) {
 				$wp_customize->get_setting( $customizer_id )->transport = 'postMessage';
 			}
 		}
+	}
+
+	/**
+	 * @param string $key
+	 * Localize js
+	 */
+	function localize_js_data( $key = 'open-customizer-preview' ) {
+
+		$localized_data = array(
+			'widget_ids'     => $this->widget_ids
+		);
+
+		wp_localize_script( $key, 'open_hours', $localized_data );
 	}
 }
