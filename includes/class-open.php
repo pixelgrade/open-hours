@@ -38,52 +38,146 @@ class OpenPlugin {
 	}
 
 	public function define_hooks() {
-		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_preview_scripts' ) );
+		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_customizer_control_scripts' ) );
+		add_action( 'customize_preview_init', array( $this, 'enqueue_customizer_preview_scripts' ), 99999 );
 
-		add_action( 'widgets_init', array( $this, 'register_open_current_status_widget' ) );
-		add_action( 'customize_register', array( $this, 'mytheme_customize_register' ) );
+		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
+		add_action( 'customize_register', array( $this, 'open_customizer_register' ) );
+		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
 
 	}
 
-	public function enqueue_preview_scripts() {
+	/**
+	 * @param $wp_customize
+	 * Register the Overview section
+	 */
+	function register_opening_hours_main_section( $wp_customize ) {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Control/class-Pix_Open_Customize_Overview_Control.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Control/class-Pix_Open_Customize_Textarea_Control.php';
 
+		// Add our section to the customizer
+		$wp_customize->add_section( 'open_hours_overview_section', array(
+			'title'    => __( 'Opening Hours', 'open_hours' ),
+			'priority' => 9999,
+		) );
+
+		$wp_customize->add_setting( 'open_hours_overview_setting', array(
+			'transport' => 'postMessage',
+			'type'      => 'option'
+		) );
+
+		$wp_customize->add_setting( 'open_hours_overview-dummy', array(
+			'transport' => 'postMessage',
+			'type'      => 'option'
+		) );
+
+		$overview_textarea_control = new Pix_Open_Customize_Textarea_Control(
+			$wp_customize,
+			'open_hours_overview_setting',
+			array(
+				'section'     => 'open_hours_overview_section',
+				'description' => __( 'something something in the month of may 1' )
+			)
+		);
+
+		$wp_customize->add_control( $overview_textarea_control );
+
+		// Add control for Overview description
+		$wp_customize->add_setting( 'open_hours_overview_description', array(
+			'transport' => 'postMessage',
+			'type'      => 'option'
+		) );
+
+		$overview_description_control = new Pix_Open_Customize_Overview_Control(
+			$wp_customize,
+			'open_hours_overview_description',
+			array(
+				'label'       => __( 'Description', 'open-hours' ),
+				'section'     => 'open_hours_overview_section',
+				'description' => __( 'something something in the month of may 2' )
+			)
+		);
+
+		$wp_customize->add_control( $overview_description_control );
+	}
+
+	/**
+	 * Enqueue control scripts
+	 */
+	public function enqueue_customizer_control_scripts() {
+
+		wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
+			'jquery',
+			'wp-util'
+		), $this->plugin_version, true );
+		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+	}
+
+	/**
+	 * Enqueue live preview scripts
+	 */
+	public function enqueue_customizer_preview_scripts() {
 		wp_enqueue_script( 'open-customizer-preview', plugin_dir_url( __FILE__ ) . 'js/open-customizer-preview.js', array(
 			'jquery',
 			'wp-util'
 		), $this->plugin_version, true );
-	}
+		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
 
+	}
 
 	/**
 	 * Register the Open Current Status Widget
 	 */
 
-	public function register_open_current_status_widget() {
+	public function register_widgets() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-current-status-widget.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-overview-widget.php';
 
-		register_widget( 'OpenCurrentStatus_Widget' );
+		OpenCurrentStatus_Widget::registerWidget();
+		OpenOverview_Widget::registerWidget();
 	}
 
-	function mytheme_customize_register( WP_Customize_Manager $wp_customize ) {
-//		var_dump(get_option('widget_open_current_status_widget'));
-//		var_dump($GLOBALS['wp_widget_factory']->widgets['OpenCurrentStatus_Widget']);
-		$widgetId= 'open_current_status_widget-2';
-		$manager                      = new WP_Customize_Widgets( $wp_customize );
-		$current_status_customizer_id = $manager->get_setting_id( $widgetId );
 
-		$current_status_setting = $wp_customize->get_setting( $current_status_customizer_id );
+	function open_customizer_register( WP_Customize_Manager $wp_customize ) {
+		// Change transport for this widget to postMessage
+		$this->_set_post_message_transport( 'OpenCurrentStatus_Widget', $wp_customize );
+		$this->_set_post_message_transport( 'OpenOverview_Widget', $wp_customize );
+	}
 
-		if ( $current_status_setting ) {
-			$wp_customize->get_setting( $current_status_customizer_id )->transport = 'postMessage';
+	/**
+	 * A helper function that takes a widget's Class Name and returns the Customizer ID for that widget's settings
+	 *
+	 * @param $widget_class
+	 * @param $wp_customize
+	 *
+	 * @return string
+	 */
+	function _set_post_message_transport( $widget_class, $wp_customize ) {
+		$current_widget = $GLOBALS['wp_widget_factory']->widgets[ $widget_class ];
+		$manager        = new WP_Customize_Widgets( $wp_customize );
+
+		$widget_number  = $current_widget->number;
+		$widget_base_id = $current_widget->control_options['id_base'];
+
+		switch ( $widget_class ) {
+			case 'OpenCurrentStatus_Widget':
+				$widget_type = 'current_status';
+				break;
+			case 'OpenOverview_Widget':
+				$widget_type = 'overview';
+				break;
+			default:
+				$widget_type = '';
 		}
 
-		$value = array('hello'=>'there', 'is_widget_customizer_js_value'=>true);
+		for ( $i = 0; $i <= $widget_number; $i ++ ) {
+			$widget_id       = 'open_' . $widget_type . '_widget-' . $i;
+			$customizer_id   = $manager->get_setting_id( $widget_id );
+			$widget_settings = $wp_customize->get_setting( $customizer_id );
 
-//		$manager->sanitize_widget_js_instance($value);
-		//		var_dump();
-//		var_dump($wp_customize->get_setting( 'widget_open_current_status_widget[2]' )->transport);
-
+			if ( $widget_settings ) {
+				$wp_customize->get_setting( $customizer_id )->transport = 'postMessage';
+			}
+		}
 	}
-
-
 }

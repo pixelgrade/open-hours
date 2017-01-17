@@ -84,32 +84,16 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$instance              = array();
-		$instance['title']     = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['open_note'] = ( ! empty( $new_instance['open_note'] ) ) ? strip_tags( $new_instance['open_note'] ) : '';
-		$instance['close_note'] = ( ! empty( $new_instance['close_note'] ) ) ? strip_tags( $new_instance['close_note'] ) : '';
 
 		return $instance;
 	}
 
-	// @TODO Change the output to use shortcodes
+	/**
+	 * @param $args
+	 * @param $instance
+	 * Widget content
+	 */
 	protected function widget_content( $args, $instance ) {
-		echo $args['before_widget'];
-		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
-		}
-
-		// Display the open Note
-		if (array_key_exists('open_note', $instance)) {
-			echo __( $instance['open_note'], 'text_domain' );
-		}
-
-		// Display the close note
-		if (array_key_exists('close_note', $instance)) {
-			echo esc_html__( $instance['close_note'], 'text_domain' );
-		}
-
-		echo esc_html__( 'Hello,dsadass World!' , 'text_domain' );
-		echo $args['after_widget'];
 	}
 
 	/**
@@ -132,6 +116,15 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
 					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="text"
 					       value="<?php echo esc_attr( $value ); ?>">
+				</p>
+				<?php
+				break;
+			case 'checkbox':
+				?>
+				<p>
+					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
+					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
+					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox" >
 				</p>
 				<?php
 				break;
@@ -165,11 +158,11 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 		return $this->fields[ $name ];
 	}
 
-//	public static function registerWidget() {
-//		register_widget( get_called_class() );
-//	}
+	public static function registerWidget() {
+		register_widget(get_called_class());
+	}
 
-//	/** Adds all fields for this Widget */
+	/** Adds all fields for this Widget */
 	abstract protected function registerFields();
 
 	/**
@@ -177,7 +170,7 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 	 * @return    string
 	 */
 	public function getWidgetId() {
-		return $this->widgetId;
+		return $this->id;
 	}
 
 	/**
