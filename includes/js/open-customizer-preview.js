@@ -2,15 +2,15 @@
 	api.bind( 'preview-ready', function() {
 
 		// Listener for the Overview setting input
-		api('open_hours_overview_setting', function (setting) {
-			setting.bind(function (value) {
-				$('#some-random-id').empty();
-				var something = prettyHoursParser(value);
-				$.each(something, function (key, value) {
-					$('#some-random-id').append(key + ' - ' + value + '<br />');
-				});
-			});
-		});
+		// api('open_hours_overview_setting', function (setting) {
+		// 	setting.bind(function (value) {
+		// 		$('.open_overview_widget-schedule').empty();
+		// 		var something = prettyHoursParser(value);
+		// 		$.each(something, function (key, value) {
+		// 			$('.open_overview_widget-schedule').append(key + ' - ' + value + '<br />');
+		// 		});
+		// 	});
+		// });
 
 		// The IDs of all our widgets
 		let open_widgets = open_hours.widget_ids;

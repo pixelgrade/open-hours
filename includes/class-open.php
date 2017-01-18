@@ -87,7 +87,7 @@ class OpenPlugin {
 		) );
 
 		$wp_customize->add_setting( 'open_hours_overview_setting', array(
-			'transport' => 'postMessage',
+			'transport' => 'refresh',
 			'type'      => 'option'
 		) );
 
