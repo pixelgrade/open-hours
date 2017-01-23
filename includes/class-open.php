@@ -21,6 +21,7 @@ class OpenPlugin {
 	protected $plugin_version;
 
 	private $widget_ids = array();
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -45,6 +46,9 @@ class OpenPlugin {
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 		add_action( 'customize_register', array( $this, 'open_customizer_register' ) );
 		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
+
+		// Add this as shortcode
+		add_shortcode( 'open-overview-shortcode', array( $this, 'add_open_overview_shortcodes' ) );
 	}
 
 	/**
@@ -129,7 +133,6 @@ class OpenPlugin {
 	/**
 	 * Register the Open Current Status Widget
 	 */
-
 	public function register_widgets() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-current-status-widget.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-overview-widget.php';
@@ -173,10 +176,10 @@ class OpenPlugin {
 
 		// Set the transport to be postMessage
 		for ( $i = 0; $i <= $widget_number; $i ++ ) {
-			$widget_id       = 'open_' . $widget_type . '_widget-' . $i;
-			$customizer_id   = $manager->get_setting_id( $widget_id );
+			$widget_id     = 'open_' . $widget_type . '_widget-' . $i;
+			$customizer_id = $manager->get_setting_id( $widget_id );
 			// push to localized widget_ids array
-			array_push($this->widget_ids, $widget_id);
+			array_push( $this->widget_ids, $widget_id );
 
 			$widget_settings = $wp_customize->get_setting( $customizer_id );
 
@@ -193,9 +196,80 @@ class OpenPlugin {
 	function localize_js_data( $key = 'open-customizer-preview' ) {
 
 		$localized_data = array(
-			'widget_ids'     => $this->widget_ids
+			'widget_ids' => $this->widget_ids
 		);
 
 		wp_localize_script( $key, 'open_hours', $localized_data );
+	}
+
+	/**
+	 * ['open-overview-shortcode'] shortcodes
+	 */
+	function add_open_overview_shortcodes( $atts, $content = null ) {
+		$overview_option = get_option( 'open_hours_overview_setting' );
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Helper/class-Pix_Open_Helper.php';
+		$helper = new Pix_Open_Helper();
+
+		if ( ! $overview_option ) {
+			return $atts;
+		}
+
+		$a = shortcode_atts(
+			array(
+				'title'        => isset( $atts['title'] ) ? $atts['title'] : '',
+				'time_format'  => isset( $atts['time_format'] ) ? $atts['time_format'] : '',
+				'closed_label' => isset( $atts['closed_label'] ) ? $atts['closed_label'] : ''
+			),
+			$atts
+		);
+
+		// Parse the option to an array of days and open hours
+		$schedule = $helper->parse_open_hours( $overview_option, $atts['time_format'], $atts['closed_label'] );
+
+		ob_start();
+
+		if ( ! empty( $a['title'] ) ) {
+			echo $a['title'];
+		}
+
+		if ( $schedule ) {
+			// Display the schedule
+			?>
+			<table class="open_overview_shortcode">
+				<?php
+				foreach ( $schedule as $day => $hours ) {
+				?>
+				<tr>
+					<td>
+						<div class=<?php echo '-days-'; ?>><?php echo $day; ?></div>
+					</td>
+					<?php
+					if ( $hours === $atts['closed_label'] ) {
+						?>
+						<td>
+							<div class="open-hours-closed"
+							     id=<?php echo '-hours-'; ?>><?php echo $hours; ?></div>
+						</td>
+						<?php
+					} else {
+						?>
+						<td>
+							<div id=<?php echo 'sdsa'; ?>><?php echo $hours; ?></div>
+						</td>
+						<?php
+					}
+					}
+					?>
+				</tr>
+			</table>
+			<?php
+		} else {
+			?>
+			<p>You haven't setup a schedule yet.</p>
+			<?php
+		}
+
+		return ob_get_clean();
 	}
 }

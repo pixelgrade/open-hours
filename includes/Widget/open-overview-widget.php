@@ -12,6 +12,33 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		$description = esc_html__( 'A Foo Widget', 'text_domain' );
 
 		parent::__construct( 'open_overview_widget', $title, $description );
+
+		add_action( 'rest_api_init', array( $this, 'add_rest_routes_api' ) );
+	}
+
+	function add_rest_routes_api() {
+		//The Following registers an api route with multiple parameters.
+		register_rest_route( 'open_hours/v1', '/get_schedule_content', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'get_schedule_content' ),
+//			'permission_callback' => array( $this, 'permission_nonce_callback' )
+		) );
+	}
+
+	function get_schedule_content( $request ) {
+		$params = $request->get_body_params();
+
+		if ( ! isset( $params['values'] ) ) {
+			//exit
+			wp_send_json_error( 'damn' );
+		}
+
+		$time_format  = $params['values']['time_format'];
+		$closed_label = $params['values']['closed_label'];
+
+		$shortcode = do_shortcode( '[open-overview-shortcode ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
+
+		wp_send_json( $shortcode );
 	}
 
 	protected function registerFields() {
@@ -50,7 +77,12 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	// @TODO Change the output to use shortcodes
 	protected function widget_content( $args, $instance ) {
 		$open_hours = get_option( 'open_hours_overview_setting' );
-		$schedule   = $this->_parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'] );
+
+		// Parse the hours from the option json using the Helper class
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'Helper/class-Pix_Open_Helper.php';
+		$helper = new Pix_Open_Helper();
+
+		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'] );
 
 		$open_note  = $args['widget_id'] . '-openNote';
 		$close_note = $args['widget_id'] . '-closeNote';
@@ -59,21 +91,42 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		if ( ! empty( $instance['title'] ) ) {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
-
-		// Display the schedule
-		?>
-		<div class="open_overview_widget-schedule" >
-		<?php
-		foreach ( $schedule as $day => $hours ) {
+		if ( $schedule ) {
+			// Display the schedule
 			?>
-			<div id=<?php echo $args['widget_id'] . '-days-' . $day; ?>><?php echo $day; ?></div>
-			<div id=<?php echo $args['widget_id'] . '-hours-' . $day?>><?php echo $hours; ?></div><br/>
+			<table class="open_overview_widget-schedule">
+				<?php
+				foreach ( $schedule as $day => $hours ) {
+				?>
+				<tr>
+					<td>
+						<div id=<?php echo $args['widget_id'] . '-days-' . $day; ?>><?php echo $day; ?></div>
+					</td>
+					<?php
+					if ( $hours === $instance['closed_label'] ) {
+						?>
+						<td>
+							<div class="open-hours-closed"
+							     id=<?php echo $args['widget_id'] . '-hours-' . $day; ?>><?php echo $hours; ?></div>
+						</td>
+						<?php
+					} else {
+						?>
+						<td>
+							<div id=<?php echo $args['widget_id'] . '-hours-' . $day; ?>><?php echo $hours; ?></div>
+						</td>
+						<?php
+					}
+					}
+					?>
+					</td>
+			</table>
+			<?php
+		} else {
+			?>
+			<p>You haven't setup a schedule yet.</p>
 			<?php
 		}
-		?>
-		</div>
-		<?php
-
 		echo $args['after_widget'];
 	}
 
@@ -99,73 +152,5 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		$instance['widget_id']              = $this->getWidgetId();
 
 		return $instance;
-	}
-
-	/**
-	 * A helper function that takes in a raw JSON of timeframes and returns an array of human readable schedule
-	 */
-	function _parse_open_hours( $hours, $hours_format = null, $closed_label = 'Closed' ) {
-		$schedule = array(
-			'monday'    => $closed_label,
-			'tuesday'   => $closed_label,
-			'wednesday' => $closed_label,
-			'thursday'  => $closed_label,
-			'friday'    => $closed_label,
-			'saturday'  => $closed_label,
-			'sunday'    => $closed_label,
-		);
-
-		$hours_json = json_decode( $hours, true );
-		if ( ! isset( $hours_json['timeframes'] ) ) {
-			return false;
-		}
-
-		foreach ( $hours_json['timeframes'] as $timeframe ) {
-			foreach ( $timeframe['days'] as $day ) {
-				$start = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['start'] ), $hours_format );
-				$end   = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['end'] ), $hours_format );
-
-				switch ( $day ) {
-					case 1:
-						$schedule['monday'] = $start . ' - ' . $end;
-						break;
-					case 2:
-						$schedule['tuesday'] = $start . ' - ' . $end;
-						break;
-					case 3:
-						$schedule['wednesday'] = $start . ' - ' . $end;
-						break;
-					case 4:
-						$schedule['thursday'] = $start . ' - ' . $end;
-						break;
-					case 5:
-						$schedule['friday'] = $start . ' - ' . $end;
-						break;
-					case 6:
-						$schedule['saturday'] = $start . ' - ' . $end;
-						break;
-					case 7:
-						$schedule['sunday'] = $start . ' - ' . $end;
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		return $schedule;
-	}
-
-	/**
-	 * @param $hour
-	 * @param null $format
-	 *
-	 * @return false|string
-	 */
-	function _parse_hours( $hour, $format = null ) {
-		$timestamp = strtotime( $hour );
-		$date      = gmdate( $format, $timestamp );
-
-		return $date;
 	}
 }

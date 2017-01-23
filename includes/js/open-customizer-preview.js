@@ -43,7 +43,22 @@
 					}
 
 					console.log(widgetValues);
-					console.log(open_widgets[i]);
+
+					// Change the closed label for our Schedule
+					if (widgetValues.closed_label !== 'undefined') {
+						$('#' + widgetValues['widget_id'] + ' .open-hours-closed').html(widgetValues.closed_label);
+					}
+
+					if (widgetValues['widget_id'].includes('open_overview_widget')) {
+						$.get({
+							url: 'http://whatever.dev/wp-json/open_hours/v1/get_schedule_content',
+							data: {values: widgetValues},
+							success: function(e){
+								$('#' + widgetValues['widget_id'] + ' .widget-title + table').replaceWith(e);
+
+							}
+						});
+					}
 
 					// Change the widget's content
 					var section_id = '#' + widgetValues['widget_id'];

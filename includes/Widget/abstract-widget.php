@@ -83,7 +83,7 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 	 * @return array Updated safe values to be saved.
 	 */
 	public function update( $new_instance, $old_instance ) {
-		$instance              = array();
+		$instance = array();
 
 		return $instance;
 	}
@@ -124,10 +124,24 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
 					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
-					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox" >
+					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox">
 				</p>
 				<?php
 				break;
+			case 'description':
+				?>
+				<div style=<?php if ( isset( $field['css'] ) ) {
+					echo $field['css'];
+				}; ?>><?php echo $field['notes']['header'] ?></div>
+				<br/>
+				<?php
+				if ( isset( $field['notes'] ) && $field['notes']['footer'] ) {
+					?>
+					<div style=<?php if ( isset( $field['css'] ) ) {
+						echo $field['css'];
+					}; ?>><?php echo $field['notes']['footer'] ?></div>
+					<?php
+				}
 			default:
 				break;
 		}
@@ -159,7 +173,7 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 	}
 
 	public static function registerWidget() {
-		register_widget(get_called_class());
+		register_widget( get_called_class() );
 	}
 
 	/** Adds all fields for this Widget */

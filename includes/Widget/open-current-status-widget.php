@@ -21,14 +21,63 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'caption' => __( 'Title', 'text_domain' )
 		) );
 
+		$this->addField( 'title_foot', array(
+			'type'    => 'description',
+			'caption' => __( 'Open Note', 'text_domain' ),
+			'notes'   => array(
+				'header' => 'Write the "Open" and "Closed" messages using the tags displayed below.',
+				'footer' => _( 'See <a href="#">available tags</a> scheme.' )
+			)
+		) );
+
 		$this->addField( 'open_note', array(
 			'type'    => 'text',
 			'caption' => __( 'Open Note', 'text_domain' )
 		) );
 
+		$this->addField( 'open_note_foot', array(
+			'type'    => 'description',
+			'caption' => __( 'Open Note Foot Note', 'text_domain' ),
+			'notes'   => array(
+				'header' => 'It\'s {time} and we\'re Open until {today-end-time}',
+				'footer' => '{time} - It\'s today, we\'re Open.'
+			),
+			'css'     => 'background-color:#F4F4F4;font-style:italic;'
+		) );
+
 		$this->addField( 'close_note', array(
 			'type'    => 'text',
 			'caption' => __( 'Close Note', 'text_domain' )
+		) );
+
+		$this->addField( 'close_note_foot', array(
+			'type'    => 'description',
+			'caption' => __( 'Close Note Footnote', 'text_domain' ),
+			'notes'   => array(
+				'header' => 'We\'re closed until {next-day} at {next-time}',
+				'footer' => '{time} - it\'s closed now'
+			),
+			'css'     => 'background-color:#F4F4F4;font-style:italic;'
+		) );
+
+
+		$this->addField( 'time_format', array(
+			'type'    => 'text',
+			'caption' => __( 'Time Format', 'text_domain' )
+		) );
+
+		$this->addField( 'time_format_foot', array(
+			'type'    => 'description',
+			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
+			'notes'   => array(
+				'header' => _( '<a href="#">Learn more about time formatting</a>' ),
+				'footer' => ''
+			)
+		) );
+
+		$this->addField( 'use_short_day_name', array(
+			'type'    => 'checkbox',
+			'caption' => __( 'Use short day name', 'text_domain' )
 		) );
 	}
 
@@ -56,7 +105,6 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			<?php
 		}
 
-		echo esc_html__( 'Buh bye now', 'text_domain' );
 		echo $args['after_widget'];
 	}
 
@@ -69,4 +117,5 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
 		return $instance;
 	}
+
 }
