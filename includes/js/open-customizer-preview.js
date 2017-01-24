@@ -1,5 +1,5 @@
 (function ($, api) {
-	api.bind( 'preview-ready', function() {
+	api.bind('preview-ready', function () {
 
 		// Listener for the Overview setting input
 		// api('open_hours_overview_setting', function (setting) {
@@ -45,32 +45,75 @@
 					console.log(widgetValues);
 
 					// Change the closed label for our Schedule
-					if (widgetValues.closed_label !== 'undefined') {
+					if (widgetValues !== 'undefined' && widgetValues.closed_label !== 'undefined') {
 						$('#' + widgetValues['widget_id'] + ' .open-hours-closed').html(widgetValues.closed_label);
 					}
 
-					if (widgetValues['widget_id'].includes('open_overview_widget')) {
+					if (widgetValues !== 'undefined' && widgetValues['widget_id'] && widgetValues['widget_id'].includes('open_overview_widget')) {
 						$.get({
 							url: 'http://whatever.dev/wp-json/open_hours/v1/get_schedule_content',
 							data: {values: widgetValues},
-							success: function(e){
+							success: function (e) {
 								$('#' + widgetValues['widget_id'] + ' .widget-title + table').replaceWith(e);
-
 							}
 						});
 					}
 
+					// Replacements
+					if (widgetValues !== 'undefined' && widgetValues['widget_id'] !== 'undefined' && widgetValues['widget_id'].includes('open_current_status_widget')) {
+						//check if replacement tag is contained in open_label
+						widgetValues['open_note'] = replace_tags(widgetValues['open_note']);
+						widgetValues['closed_note'] = replace_tags(widgetValues['closed_note']);
+					}
+
+					console.log(widgetValues);
 					// Change the widget's content
 					var section_id = '#' + widgetValues['widget_id'];
 					var open_note_id = '#' + widgetValues['widget_id'] + '-openNote';
-					var close_note_id = '#' + widgetValues['widget_id'] + '-closeNote';
+					var closed_note_id = '#' + widgetValues['widget_id'] + '-closeNote';
 
 					$(section_id).find('h2').text(widgetValues['title']);
 					$(open_note_id).text(widgetValues['open_note']);
-					$(close_note_id).text(widgetValues['close_note']);
+					$(closed_note_id).text(widgetValues['closed_note']);
 				});
 
 			});
+		}
+
+		function replace_tags(value) {
+			let string = '';
+
+			if (/\{(.*?)\}/.test(value) == true) {
+				string = value;
+				let regex = /\{(.*?)\}/g,
+					occurences = string.match(regex).length,
+					match;
+				console.log(occurences);
+
+				for (let i = 0; i < occurences; i++) {
+					match = /\{(.*?)\}/.exec(string);
+					$.get({
+						url: 'http://whatever.dev/wp-json/open_hours/v1/get_time',
+						data: {value: match[1]},
+						dataType: 'jsonp',
+						async: false,
+						success: function (json) {
+							console.log(json);
+
+						},
+						error: function (data) {
+							console.log(data);
+							if (data.status == 200) {
+								string = string.replace(/\{(.*?)\}/, data.responseText);
+							}
+						}
+					});
+				}
+			} else {
+				return value;
+			}
+
+			return string;
 		}
 
 		function isOdd(num) {

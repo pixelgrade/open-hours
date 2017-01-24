@@ -142,6 +142,7 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 					}; ?>><?php echo $field['notes']['footer'] ?></div>
 					<?php
 				}
+				break;
 			default:
 				break;
 		}

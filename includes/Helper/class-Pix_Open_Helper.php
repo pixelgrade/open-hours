@@ -1,6 +1,7 @@
 <?php
 
 class Pix_Open_Helper {
+
 	/**
 	 * A helper function that takes in a raw JSON of timeframes and returns an array of human readable schedule
 	 */
@@ -67,5 +68,80 @@ class Pix_Open_Helper {
 		$date      = gmdate( $format, $timestamp );
 
 		return $date;
+	}
+
+	/**
+	 * @param null $filter
+	 *
+	 * @return bool|false|string
+	 * Returns the time for a specific filter
+	 */
+	public function get_shortcode_time( $filter = null ) {
+		$dw = date( "N", time() );
+		$overview_option = get_option( 'open_hours_overview_setting' );
+
+		if ( ! $overview_option ) {
+			return false;
+		}
+
+		$schedule = json_decode( $overview_option, true );
+		$response = '';
+
+		switch ( $filter ) {
+			case 'time-now':
+				$response = date( 'Format String', time() );
+				break;
+			case 'today':
+				$response = $dw;
+				break;
+			case 'next-day':
+				$response = $dw + 1;
+				break;
+			case 'today-start-time':
+				$today_interval = $this->_get_interval( $schedule, $dw );
+				$response       = $this->_parse_hours( $today_interval[0]['start'], 'g : i A' );
+				break;
+			case 'today-end-time':
+				$today_interval = $this->_get_interval( $schedule, $dw );
+				$response       = $this->_parse_hours( $today_interval[0]['end'], 'g : i A' );
+				break;
+			case 'next-start-time':
+				$next_day_interval = $this->_get_interval( $schedule, $dw + 1);
+				$response       = $this->_parse_hours( $next_day_interval[0]['start'], 'g : i A' );
+				break;
+			case 'next-end-time':
+				$next_day_interval = $this->_get_interval( $schedule, $dw + 1);
+				$response       = $this->_parse_hours( $next_day_interval[0]['end'], 'g : i A' );
+				break;
+			default:
+				break;
+		}
+
+		return $response;
+	}
+
+	/**
+	 * @param $schedule
+	 * @param $day
+	 *
+	 * @return array|bool
+	 *
+	 * A helper function that receives the JSON formatted schedule and returns the open interval for a specific day
+	 */
+	function _get_interval( $schedule, $day ) {
+
+		if ( ! isset( $schedule['timeframes'] ) ) {
+			return false;
+		}
+
+		$interval = array();
+
+		foreach ( $schedule['timeframes'] as $timeframe ) {
+			if ( array_key_exists( $day, $timeframe['days'] ) ) {
+				$interval = $timeframe['open'];
+			}
+		}
+
+		return $interval;
 	}
 }

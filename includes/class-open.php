@@ -48,7 +48,12 @@ class OpenPlugin {
 		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
 
 		// Add this as shortcode
-		add_shortcode( 'open-overview-shortcode', array( $this, 'add_open_overview_shortcodes' ) );
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
+		$shortcodes = new Pix_Open_Shortcodes();
+
+		add_shortcode( 'open-overview-shortcode', array( $shortcodes, 'add_open_overview_shortcodes' ) );
+		add_shortcode( 'open-time-shortcode', array( $shortcodes, 'add_open_time_shortcode' ) );
+		add_shortcode( 'open-current-status', array( $shortcodes, 'add_current_status_shortcode' ) );
 	}
 
 	/**
@@ -202,74 +207,5 @@ class OpenPlugin {
 		wp_localize_script( $key, 'open_hours', $localized_data );
 	}
 
-	/**
-	 * ['open-overview-shortcode'] shortcodes
-	 */
-	function add_open_overview_shortcodes( $atts, $content = null ) {
-		$overview_option = get_option( 'open_hours_overview_setting' );
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Helper/class-Pix_Open_Helper.php';
-		$helper = new Pix_Open_Helper();
-
-		if ( ! $overview_option ) {
-			return $atts;
-		}
-
-		$a = shortcode_atts(
-			array(
-				'title'        => isset( $atts['title'] ) ? $atts['title'] : '',
-				'time_format'  => isset( $atts['time_format'] ) ? $atts['time_format'] : '',
-				'closed_label' => isset( $atts['closed_label'] ) ? $atts['closed_label'] : ''
-			),
-			$atts
-		);
-
-		// Parse the option to an array of days and open hours
-		$schedule = $helper->parse_open_hours( $overview_option, $atts['time_format'], $atts['closed_label'] );
-
-		ob_start();
-
-		if ( ! empty( $a['title'] ) ) {
-			echo $a['title'];
-		}
-
-		if ( $schedule ) {
-			// Display the schedule
-			?>
-			<table class="open_overview_shortcode">
-				<?php
-				foreach ( $schedule as $day => $hours ) {
-				?>
-				<tr>
-					<td>
-						<div class=<?php echo '-days-'; ?>><?php echo $day; ?></div>
-					</td>
-					<?php
-					if ( $hours === $atts['closed_label'] ) {
-						?>
-						<td>
-							<div class="open-hours-closed"
-							     id=<?php echo '-hours-'; ?>><?php echo $hours; ?></div>
-						</td>
-						<?php
-					} else {
-						?>
-						<td>
-							<div id=<?php echo 'sdsa'; ?>><?php echo $hours; ?></div>
-						</td>
-						<?php
-					}
-					}
-					?>
-				</tr>
-			</table>
-			<?php
-		} else {
-			?>
-			<p>You haven't setup a schedule yet.</p>
-			<?php
-		}
-
-		return ob_get_clean();
-	}
 }

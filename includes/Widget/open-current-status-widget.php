@@ -12,6 +12,29 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		$description = esc_html__( 'A Foo Widget', 'text_domain' );
 
 		parent::__construct( 'open_current_status_widget', $title, $description );
+
+		add_action( 'rest_api_init', array( $this, 'add_rest_routes_api' ) );
+	}
+
+	function add_rest_routes_api() {
+		//The Following registers an api route with multiple parameters.
+		register_rest_route( 'open_hours/v1', '/get_time', array(
+			'methods'  => 'GET',
+			'callback' => array( $this, 'get_time' ),
+//			'permission_callback' => array( $this, 'permission_nonce_callback' )
+		) );
+	}
+
+	function get_time( $request ) {
+		$params = $request->get_body_params();
+
+		if ( ! isset( $params['value'] ) ) {
+			wp_send_json_error( 'No value!' );
+		}
+
+		$shortcode = do_shortcode( '[open-time-shortcode value=' . '"' . $params['value'] . '"' . ']' );
+
+		return new WP_REST_Response( $shortcode );
 	}
 
 	protected function registerFields() {
@@ -45,14 +68,14 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'css'     => 'background-color:#F4F4F4;font-style:italic;'
 		) );
 
-		$this->addField( 'close_note', array(
+		$this->addField( 'closed_note', array(
 			'type'    => 'text',
-			'caption' => __( 'Close Note', 'text_domain' )
+			'caption' => __( 'Closed Note', 'text_domain' )
 		) );
 
-		$this->addField( 'close_note_foot', array(
+		$this->addField( 'closed_note_foot', array(
 			'type'    => 'description',
-			'caption' => __( 'Close Note Footnote', 'text_domain' ),
+			'caption' => __( 'Closed Note Footnote', 'text_domain' ),
 			'notes'   => array(
 				'header' => 'We\'re closed until {next-day} at {next-time}',
 				'footer' => '{time} - it\'s closed now'
@@ -83,8 +106,8 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
 	// @TODO Change the output to use shortcodes
 	protected function widget_content( $args, $instance ) {
-		$open_note  = $args['widget_id'] . '-openNote';
-		$close_note = $args['widget_id'] . '-closeNote';
+		$open_note_id  = $args['widget_id'] . '-openNote';
+		$close_note_id = $args['widget_id'] . '-closeNote';
 
 		echo $args['before_widget'];
 		if ( ! empty( $instance['title'] ) ) {
@@ -92,28 +115,18 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		}
 
 		// Display the open Note
-		if ( array_key_exists( 'open_note', $instance ) ) {
-			?>
-			<div id=<?php echo $open_note ?>><?php echo __( $instance['open_note'], 'text_domain' ); ?></div>
-			<?php
-		}
-
-		// Display the close note
-		if ( array_key_exists( 'close_note', $instance ) ) {
-			?>
-			<div id=<?php echo $close_note ?>><?php echo __( $instance['close_note'], 'text_domain' ); ?></div>
-			<?php
-		}
+		echo do_shortcode( '[open-current-status ' . 'open_note_id=' . '"' . $open_note_id . '"' . ' close_note_id=' . '"' . $close_note_id . '"' . ' open_note=' . '"' . $instance['open_note'] . '"' . ' closed_note=' . '"' . $instance['closed_note'] . '"' . ']' );
 
 		echo $args['after_widget'];
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance               = array();
-		$instance['title']      = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['open_note']  = ( ! empty( $new_instance['open_note'] ) ) ? strip_tags( $new_instance['open_note'] ) : '';
-		$instance['close_note'] = ( ! empty( $new_instance['close_note'] ) ) ? strip_tags( $new_instance['close_note'] ) : '';
-		$instance['widget_id']  = $this->getWidgetId();
+		$instance                = array();
+		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? strip_tags( $new_instance['open_note'] ) : '';
+		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? strip_tags( $new_instance['closed_note'] ) : '';
+		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
+		$instance['widget_id']   = $this->getWidgetId();
 
 		return $instance;
 	}
