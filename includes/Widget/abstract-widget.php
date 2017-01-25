@@ -123,8 +123,8 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				?>
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
-					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
-					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox">
+					<input class="checkbox" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
+					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox" value=<?php echo esc_attr( $this->get_field_id( $field['name'] ) );  ?> <?php checked(isset($instance[$field['name']]) ? $instance[$field['name']] : 0); ?>>
 				</p>
 				<?php
 				break;

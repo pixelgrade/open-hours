@@ -104,7 +104,12 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		) );
 	}
 
-	// @TODO Change the output to use shortcodes
+	/**
+	 * @param $args
+	 * @param $instance
+	 *
+	 * The widget content
+	 */
 	protected function widget_content( $args, $instance ) {
 		$open_note_id  = $args['widget_id'] . '-openNote';
 		$close_note_id = $args['widget_id'] . '-closeNote';
@@ -115,7 +120,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		}
 
 		// Display the open Note
-		echo do_shortcode( '[open-current-status ' . 'open_note_id=' . '"' . $open_note_id . '"' . ' close_note_id=' . '"' . $close_note_id . '"' . ' open_note=' . '"' . $instance['open_note'] . '"' . ' closed_note=' . '"' . $instance['closed_note'] . '"' . ']' );
+		echo do_shortcode( '[open-current-status ' . 'open_note_id=' . '"' . $open_note_id . '"' . ' close_note_id=' . '"' . $close_note_id . '"' . ' open_note=' . '"' . $instance['open_note'] . '"' . ' closed_note=' . '"' . $instance['closed_note'] . '"' . ' time_format=' . '"' . $instance['time_format'] . '"' . ']' );
 
 		echo $args['after_widget'];
 	}
@@ -123,9 +128,10 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	public function update( $new_instance, $old_instance ) {
 		$instance                = array();
 		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? strip_tags( $new_instance['open_note'] ) : '';
-		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? strip_tags( $new_instance['closed_note'] ) : '';
+		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? esc_attr( $new_instance['open_note'] ) : '';
+		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? esc_attr( $new_instance['closed_note'] ) : '';
 		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
+		$instance['use_short_day_name']         = ( ! empty( $new_instance['use_short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']   = $this->getWidgetId();
 
 		return $instance;

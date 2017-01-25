@@ -45,32 +45,32 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		// Fields
 		$this->addField( 'title', array(
 			'type'    => 'text',
-			'caption' => __( 'Title', 'text_domain' )
+			'caption' => __( 'Title', 'open_hours' )
 		) );
 
 		$this->addField( 'compress_opening_hours', array(
 			'type'    => 'checkbox',
-			'caption' => __( 'Compress Opening Hours', 'text_domain' )
+			'caption' => __( 'Compress Opening Hours', 'open_hours' )
 		) );
 
 		$this->addField( 'hide_closed_days', array(
 			'type'    => 'checkbox',
-			'caption' => __( 'Hide Closed Days', 'text_domain' )
+			'caption' => __( 'Hide Closed Days', 'open_hours' )
 		) );
 
 		$this->addField( 'closed_label', array(
 			'type'    => 'text',
-			'caption' => __( 'Closed Label', 'text_domain' )
+			'caption' => __( 'Closed Label', 'open_hours' )
 		) );
 
 		$this->addField( 'time_format', array(
 			'type'    => 'text',
-			'caption' => __( 'Time Format', 'text_domain' )
+			'caption' => __( 'Time Format', 'open_hours' )
 		) );
 
 		$this->addField( 'short_day_name', array(
 			'type'    => 'checkbox',
-			'caption' => __( 'Use Short Day Name', 'text_domain' )
+			'caption' => __( 'Use Short Day Name', 'open_hours' )
 		) );
 	}
 
@@ -82,7 +82,25 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'Helper/class-Pix_Open_Helper.php';
 		$helper = new Pix_Open_Helper();
 
-		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'] );
+		if ($instance['short_day_name'] == 1) {
+			$use_short_days = true;
+		} else {
+			$use_short_days = false;
+		}
+
+		if ($instance['compress_opening_hours'] == 1) {
+			$compress_hours = true;
+		} else {
+			$compress_hours = false;
+		}
+
+		if ($instance['hide_closed_days'] == 1) {
+			$hide_closed_days = true;
+		} else {
+			$hide_closed_days = false;
+		}
+
+		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'], $use_short_days, $compress_hours, $hide_closed_days);
 
 		$open_note  = $args['widget_id'] . '-openNote';
 		$close_note = $args['widget_id'] . '-closeNote';
@@ -119,7 +137,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 					}
 					}
 					?>
-					</td>
+					</tr>
 			</table>
 			<?php
 		} else {
@@ -144,11 +162,11 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	public function update( $new_instance, $old_instance ) {
 		$instance                           = array();
 		$instance['title']                  = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['compress_opening_hours'] = ( ! empty( $new_instance['compress_opening_hours'] ) ) ? strip_tags( $new_instance['compress_opening_hours'] ) : '';
-		$instance['hide_closed_days']       = ( ! empty( $new_instance['hide_closed_days'] ) ) ? strip_tags( $new_instance['hide_closed_days'] ) : '';
+		$instance['compress_opening_hours'] = ( ! empty( $new_instance['compress_opening_hours'] ) ) ? '1' : '0';
+		$instance['hide_closed_days']       = ( ! empty( $new_instance['hide_closed_days'] ) ) ? '1' : '0';
 		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : '';
 		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
-		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? strip_tags( $new_instance['short_day_name'] ) : '';
+		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']              = $this->getWidgetId();
 
 		return $instance;

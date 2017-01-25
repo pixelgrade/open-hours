@@ -103,22 +103,23 @@ class Pix_Open_Shortcodes {
 	function add_current_status_shortcode( $atts ) {
 		$a = shortcode_atts(
 			array(
-				'open_note'  => isset( $atts['open_note'] ) ? $atts['open_note'] : '',
+				'open_note'   => isset( $atts['open_note'] ) ? $atts['open_note'] : '',
 				'closed_note' => isset( $atts['closed_note'] ) ? $atts['closed_note'] : '',
+				'time_format' => isset( $atts['time_format'] ) ? $atts['time_format'] : 'g : i A'
 			),
 			$atts
 		);
 
-		$open_note  = $this->_replace_strings( $a['open_note'] );
-		$closed_note = $this->_replace_strings( $a['closed_note'] );
+		$open_note   = $this->_replace_strings( $a['open_note'], $a['time_format'] );
+		$closed_note = $this->_replace_strings( $a['closed_note'], $a['time_format'] );
 
 		$open_note_id  = isset( $atts['open_note_id'] ) ? $atts['open_note_id'] : '';
 		$close_note_id = isset( $atts['close_note_id'] ) ? $atts['close_note_id'] : '';
 
 		ob_start();
 		?>
-		<div id=<?php echo $open_note_id ?>><?php echo __( $open_note, 'open_hours' ); ?></div>
-		<div id=<?php echo $close_note_id ?>><?php echo __( $closed_note, 'text_domain' ); ?></div>
+		<div id=<?php echo $open_note_id ?>><?php echo esc_attr( $open_note ); ?></div>
+		<div id=<?php echo $close_note_id ?>><?php echo esc_attr( $closed_note ); ?></div>
 		<?php
 
 		return ob_get_clean();
@@ -129,7 +130,7 @@ class Pix_Open_Shortcodes {
 	 *
 	 * Parse a string that contains replacement tags
 	 */
-	function _replace_strings( $string ) {
+	function _replace_strings( $string, $time_format = 'g : i A' ) {
 		preg_match_all( '/\{(.*?)\}/', $string, $matches );
 		$helper = new Pix_Open_Helper();
 
@@ -138,7 +139,7 @@ class Pix_Open_Shortcodes {
 			return $string;
 		}
 		for ( $i = 0; $i < count( $matches[0] ); $i ++ ) {
-			$string = str_replace( $matches[0][ $i ], $helper->get_shortcode_time( $matches[1][ $i ] ), $string );
+			$string = str_replace( $matches[0][ $i ], $helper->get_shortcode_time( $matches[1][ $i ], $time_format ), $string );
 		}
 
 		return $string;

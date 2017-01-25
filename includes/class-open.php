@@ -189,7 +189,7 @@ class OpenPlugin {
 			$widget_settings = $wp_customize->get_setting( $customizer_id );
 
 			if ( $widget_settings ) {
-				$wp_customize->get_setting( $customizer_id )->transport = 'postMessage';
+//				$wp_customize->get_setting( $customizer_id )->transport = 'postMessage';
 			}
 		}
 	}

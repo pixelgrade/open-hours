@@ -5,53 +5,80 @@ class Pix_Open_Helper {
 	/**
 	 * A helper function that takes in a raw JSON of timeframes and returns an array of human readable schedule
 	 */
-	public function parse_open_hours( $hours, $hours_format = null, $closed_label = 'Closed' ) {
-		$schedule = array(
-			'monday'    => $closed_label,
-			'tuesday'   => $closed_label,
-			'wednesday' => $closed_label,
-			'thursday'  => $closed_label,
-			'friday'    => $closed_label,
-			'saturday'  => $closed_label,
-			'sunday'    => $closed_label,
-		);
-
+	public function parse_open_hours( $hours, $hours_format = null, $closed_label = 'Closed', $use_short_days = false, $compress_hours = false, $hide_closed_days = false ) {
 		$hours_json = json_decode( $hours, true );
+		$schedule   = array();
+
 		if ( ! isset( $hours_json['timeframes'] ) ) {
 			return false;
 		}
 
-		foreach ( $hours_json['timeframes'] as $timeframe ) {
-			foreach ( $timeframe['days'] as $day ) {
-				$start = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['start'] ), $hours_format );
-				$end   = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['end'] ), $hours_format );
+		// Short day name or long day name
+		if ( $use_short_days ) {
+			$day_format = 'D';
+		} else {
+			$day_format = 'l';
+		}
 
-				switch ( $day ) {
-					case 1:
-						$schedule['monday'] = $start . ' - ' . $end;
-						break;
-					case 2:
-						$schedule['tuesday'] = $start . ' - ' . $end;
-						break;
-					case 3:
-						$schedule['wednesday'] = $start . ' - ' . $end;
-						break;
-					case 4:
-						$schedule['thursday'] = $start . ' - ' . $end;
-						break;
-					case 5:
-						$schedule['friday'] = $start . ' - ' . $end;
-						break;
-					case 6:
-						$schedule['saturday'] = $start . ' - ' . $end;
-						break;
-					case 7:
-						$schedule['sunday'] = $start . ' - ' . $end;
-						break;
-					default:
-						break;
+		// Create the initial array containing all the days of the week
+		if ( ! $compress_hours && ! $hide_closed_days ) {
+			for ( $i = 1; $i <= 7; $i ++ ) {
+				$dow              = date( $day_format, strtotime( "Sunday +{$i} days" ) );
+				$schedule[ $dow ] = $closed_label;
+			}
+		}
+		// Get the closed days
+		$closed_days = $this->_get_closed_days( $hours_json['timeframes'], $day_format );
+
+		// Loop through our timeframes and add time intervals to our days
+		foreach ( $hours_json['timeframes'] as $timeframe ) {
+			if ( $compress_hours ) {
+				// if the compress_opening_hours option is true - return compressed array
+				$compressed_days          = $this->_parse_consecutive_days( $timeframe, $day_format, $hours_format );
+				$compressed_days_interval = array_values( $compressed_days );
+
+				$schedule[ key( $compressed_days ) ] = $compressed_days_interval[0];
+			} else {
+				// Build the normal array schedule
+				foreach ( $timeframe['days'] as $day ) {
+					$start = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['start'] ), $hours_format );
+					$end   = $this->_parse_hours( preg_replace( '/^\+/', '', $timeframe['open'][0]['end'] ), $hours_format );
+
+
+					$day_key = date( $day_format, strtotime( "Sunday +{$day} days" ) );
+					// Add the open time interval
+					switch ( $day ) {
+						case 1:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 2:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 3:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 4:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 5:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 6:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						case 7:
+							$schedule[ $day_key ] = $start . ' - ' . $end;
+							break;
+						default:
+							break;
+					}
 				}
 			}
+		}
+
+		// if compressed hours - add the closed days at the end
+		if ( $compress_hours && ! empty( $closed_days ) && ! $hide_closed_days ) {
+			$schedule[ key( $closed_days ) ] = $closed_label;
 		}
 
 		return $schedule;
@@ -76,8 +103,8 @@ class Pix_Open_Helper {
 	 * @return bool|false|string
 	 * Returns the time for a specific filter
 	 */
-	public function get_shortcode_time( $filter = null ) {
-		$dw = date( "N", time() );
+	public function get_shortcode_time( $filter = null, $time_format = 'g:i A' ) {
+		$dw              = date( "N", time() );
 		$overview_option = get_option( 'open_hours_overview_setting' );
 
 		if ( ! $overview_option ) {
@@ -85,33 +112,36 @@ class Pix_Open_Helper {
 		}
 
 		$schedule = json_decode( $overview_option, true );
-		$response = '';
+		$response = 'closed';
 
 		switch ( $filter ) {
-			case 'time-now':
-				$response = date( 'Format String', time() );
+			case 'time':
+				$response = date( $time_format );
 				break;
 			case 'today':
-				$response = $dw;
+				$response = date('l', strtotime("Sunday + {$dw} days"));
 				break;
 			case 'next-day':
-				$response = $dw + 1;
+				$dw = $dw+1;
+				$response = date('l', strtotime("Sunday + {$dw} days"));
 				break;
 			case 'today-start-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				$response       = $this->_parse_hours( $today_interval[0]['start'], 'g : i A' );
+				$response       = $this->_parse_hours( $today_interval[0]['start'], $time_format );
 				break;
 			case 'today-end-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				$response       = $this->_parse_hours( $today_interval[0]['end'], 'g : i A' );
+				$response       = $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				break;
 			case 'next-start-time':
-				$next_day_interval = $this->_get_interval( $schedule, $dw + 1);
-				$response       = $this->_parse_hours( $next_day_interval[0]['start'], 'g : i A' );
+				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
+				$response          = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
 				break;
 			case 'next-end-time':
-				$next_day_interval = $this->_get_interval( $schedule, $dw + 1);
-				$response       = $this->_parse_hours( $next_day_interval[0]['end'], 'g : i A' );
+				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
+				if ($next_day_interval) {
+					$response          = $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
+				}
 				break;
 			default:
 				break;
@@ -144,4 +174,80 @@ class Pix_Open_Helper {
 
 		return $interval;
 	}
+
+	function _parse_consecutive_days( $timeframe, $day_format, $hours_format ) {
+		$days = $timeframe['days'];
+		$open = $timeframe['open'];
+
+		$start    = $this->_parse_hours( preg_replace( '/^\+/', '', $open[0]['start'] ), $hours_format );
+		$end      = $this->_parse_hours( preg_replace( '/^\+/', '', $open[0]['end'] ), $hours_format );
+		$response = array();
+
+		$consecutive_days     = array();
+		$non_consecutive_days = array();
+
+		for ( $i = 0; $i < count( $days ); $i ++ ) {
+			if ( isset( $days[ $i + 1 ] ) && $days[ $i ] == $days[ $i + 1 ] - 1 ) {
+				// consecutive
+				array_push( $consecutive_days, $days[ $i ] );
+			} elseif ( isset( $days[ $i - 1 ] ) && $days[ $i ] == $days[ $i - 1 ] + 1 ) {
+				array_push( $consecutive_days, $days[ $i ] );
+			} else {
+				// not consecutive
+				array_push( $non_consecutive_days, $days[ $i ] );
+			}
+		}
+
+		if ( ! empty( $consecutive_days ) ) {
+			$parsed_first_day = date( $day_format, strtotime( "Sunday +{$consecutive_days[0]} days" ) );
+			$last_element     = array_values( array_slice( $consecutive_days, - 1 ) );
+
+			$parsed_last_day = date( $day_format, strtotime( "Sunday +{$last_element[0]} days" ) );
+
+			$response[ $parsed_first_day . ' - ' . $parsed_last_day ] = $start . ' - ' . $end;
+		}
+
+		if ( ! empty ( $non_consecutive_days ) ) {
+			foreach ( $non_consecutive_days as $ncd ) {
+				$parsed_day              = date( $day_format, strtotime( "Sunday +{$ncd} days" ) );
+				$response[ $parsed_day ] = $start . ' - ' . $end;
+			}
+
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Helper function that returns closed days
+	 */
+	function _get_closed_days( $timeframes, $day_format = 'l' ) {
+		$present_days = array();
+		$all_days     = array( 1, 2, 3, 4, 5, 6, 7 );
+		$key          = '';
+
+		foreach ( $timeframes as $timeframe ) {
+			$present_days = array_merge( $present_days, $timeframe['days'] );
+		}
+
+		$closed_days = array_diff( $all_days, $present_days );
+
+		if ( ! empty( $closed_days ) ) {
+			$num_days = count( $closed_days );
+			$i        = 0;
+
+			foreach ( $closed_days as $closed_day ) {
+				$parsed_day = date( $day_format, strtotime( "Sunday +{$closed_day} days" ) );
+				if ( ++ $i !== $num_days ) {
+					$key .= $parsed_day . ', ';
+				} else {
+					$key .= $parsed_day;
+				}
+			}
+		}
+		$response[ $key ] = 'closed';
+
+		return $response;
+	}
+
 }
