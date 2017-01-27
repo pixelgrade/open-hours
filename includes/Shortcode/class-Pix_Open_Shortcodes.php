@@ -10,8 +10,13 @@ class Pix_Open_Shortcodes {
 	 * ['open-overview-shortcode'] shortcodes
 	 */
 	function add_open_overview_shortcodes( $atts, $content = null ) {
+
 		$overview_option = get_option( 'open_hours_overview_setting' );
 		$helper          = new Pix_Open_Helper();
+
+		if ( isset( $atts['overview_option'] ) && ! empty( $atts['overview_option'] ) ) {
+			$overview_option = base64_decode($atts['overview_option']);
+		}
 
 		if ( ! $overview_option ) {
 			return $atts;
@@ -20,14 +25,14 @@ class Pix_Open_Shortcodes {
 		$a = shortcode_atts(
 			array(
 				'title'        => isset( $atts['title'] ) ? $atts['title'] : '',
-				'time_format'  => isset( $atts['time_format'] ) ? $atts['time_format'] : '',
-				'closed_label' => isset( $atts['closed_label'] ) ? $atts['closed_label'] : ''
+				'time_format'  => isset( $atts['time_format'] ) ? $atts['time_format'] : 'g:i a',
+				'closed_label' => isset( $atts['closed_label'] ) ? $atts['closed_label'] : 'Closed'
 			),
 			$atts
 		);
 
 		// Parse the option to an array of days and open hours
-		$schedule = $helper->parse_open_hours( $overview_option, $atts['time_format'], $atts['closed_label'] );
+		$schedule = $helper->parse_open_hours( $overview_option, $a['time_format'], $a['closed_label'] );
 
 		ob_start();
 
@@ -47,7 +52,7 @@ class Pix_Open_Shortcodes {
 						<div class=<?php echo '-days-'; ?>><?php echo $day; ?></div>
 					</td>
 					<?php
-					if ( $hours === $atts['closed_label'] ) {
+					if ( $hours === $a['closed_label'] ) {
 						?>
 						<td>
 							<div class="open-hours-closed"

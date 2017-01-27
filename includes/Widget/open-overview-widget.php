@@ -21,24 +21,45 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		register_rest_route( 'open_hours/v1', '/get_schedule_content', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'get_schedule_content' ),
-//			'permission_callback' => array( $this, 'permission_nonce_callback' )
+			'permission_callback' => array( $this, 'permission_nonce_callback' )
 		) );
 	}
 
 	function get_schedule_content( $request ) {
-		$params = $request->get_body_params();
+		$params    = $request->get_params();
+		$shortcode = '';
 
-		if ( ! isset( $params['values'] ) ) {
+		if ( ! isset( $params['values'] ) && ! isset( $params['overview_option'] ) ) {
 			//exit
-			wp_send_json_error( 'damn' );
+			wp_send_json_error( 'No data sent!' );
 		}
 
-		$time_format  = $params['values']['time_format'];
-		$closed_label = $params['values']['closed_label'];
+		if ( isset( $params['overview_option'] ) && ! empty( $params['overview_option'] ) ) {
+			$shortcode = do_shortcode( '[open-overview-shortcode ' . 'overview_option=' . base64_encode( $params['overview_option'] ) . ']' );
+		} elseif ( isset( $params['values'] ) ) {
+			$time_format  = $params['values']['time_format'];
+			$closed_label = $params['values']['closed_label'];
 
-		$shortcode = do_shortcode( '[open-overview-shortcode ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
+			$shortcode = do_shortcode( '[open-overview-shortcode ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
+		}
 
 		wp_send_json( $shortcode );
+	}
+
+	/**
+	 * @return false|int
+	 * Check the nonce
+	 */
+	function permission_nonce_callback() {
+		$nonce = '';
+
+		if ( isset( $_REQUEST['open_nonce'] ) ) {
+			$nonce = $_REQUEST['open_nonce'];
+		} elseif ( isset( $_POST['open_nonce'] ) ) {
+			$nonce = $_POST['open_nonce'];
+		}
+
+		return wp_verify_nonce( $nonce, 'open_rest' );
 	}
 
 	protected function registerFields() {
@@ -82,25 +103,25 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'Helper/class-Pix_Open_Helper.php';
 		$helper = new Pix_Open_Helper();
 
-		if ($instance['short_day_name'] == 1) {
+		if ( $instance['short_day_name'] == 1 ) {
 			$use_short_days = true;
 		} else {
 			$use_short_days = false;
 		}
 
-		if ($instance['compress_opening_hours'] == 1) {
+		if ( $instance['compress_opening_hours'] == 1 ) {
 			$compress_hours = true;
 		} else {
 			$compress_hours = false;
 		}
 
-		if ($instance['hide_closed_days'] == 1) {
+		if ( $instance['hide_closed_days'] == 1 ) {
 			$hide_closed_days = true;
 		} else {
 			$hide_closed_days = false;
 		}
 
-		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'], $use_short_days, $compress_hours, $hide_closed_days);
+		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'], $use_short_days, $compress_hours, $hide_closed_days );
 
 		$open_note  = $args['widget_id'] . '-openNote';
 		$close_note = $args['widget_id'] . '-closeNote';
@@ -137,7 +158,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 					}
 					}
 					?>
-					</tr>
+				</tr>
 			</table>
 			<?php
 		} else {

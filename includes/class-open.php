@@ -41,6 +41,8 @@ class OpenPlugin {
 
 	public function define_hooks() {
 		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_customizer_control_scripts' ) );
+		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+
 		add_action( 'customize_preview_init', array( $this, 'enqueue_customizer_preview_scripts' ), 99999 );
 
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
@@ -54,6 +56,7 @@ class OpenPlugin {
 		add_shortcode( 'open-overview-shortcode', array( $shortcodes, 'add_open_overview_shortcodes' ) );
 		add_shortcode( 'open-time-shortcode', array( $shortcodes, 'add_open_time_shortcode' ) );
 		add_shortcode( 'open-current-status', array( $shortcodes, 'add_current_status_shortcode' ) );
+
 	}
 
 	/**
@@ -66,6 +69,8 @@ class OpenPlugin {
 			'wp-util'
 		), $this->plugin_version, true );
 		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+
+		$this->localize_control_js_data();
 	}
 
 	/**
@@ -78,7 +83,18 @@ class OpenPlugin {
 		), $this->plugin_version, true );
 		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
 
-		$this->localize_js_data();
+		$this->localize_preview_js_data();
+	}
+
+	/**
+	 * Register the stylesheets for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles() {
+//		if ( $this->is_pixelgrade_care_dashboard() ) {
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
+//		}
 	}
 
 	/**
@@ -194,18 +210,39 @@ class OpenPlugin {
 		}
 	}
 
+
 	/**
 	 * @param string $key
 	 * Localize js
 	 */
-	function localize_js_data( $key = 'open-customizer-preview' ) {
+	function localize_preview_js_data( $key = 'open-customizer-preview' ) {
 
 		$localized_data = array(
-			'widget_ids' => $this->widget_ids
+			'widget_ids' => $this->widget_ids,
+			'wp_rest'            => array(
+				'root'                  => esc_url_raw( rest_url() ),
+				'nonce'                 => wp_create_nonce( 'wp_rest' ),
+				'open_nonce'            => wp_create_nonce( 'open_rest' )
+			),
 		);
 
 		wp_localize_script( $key, 'open_hours', $localized_data );
 	}
 
+	/**
+	 * @param string $key
+	 * Localize js
+	 */
+	function localize_control_js_data( $key = 'open-customizer-control' ) {
+		$localized_data = array(
+			'wp_rest'            => array(
+				'root'                  => esc_url_raw( rest_url() ),
+				'nonce'                 => wp_create_nonce( 'wp_rest' ),
+				'open_nonce'            => wp_create_nonce( 'open_rest' )
+			),
+		);
+
+		wp_localize_script( $key, 'open_hours_control', $localized_data );
+	}
 
 }

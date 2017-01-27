@@ -1,0 +1,39 @@
+li[id*=open_hours_overview] {
+  .widget-control-actions {
+    margin-top: 10px;
+  }
+
+  .widget-top a.widget-action:after {
+    content: "\f139";
+  }
+
+  &.expanded {
+
+    .preview_open_widget {
+      opacity: 1 !important;
+      transition: opacity 0.2s;
+    }
+
+    a.widget-action:after {
+      content: "\f141";
+    }
+  }
+
+}
+
+.preview_open_widget {
+  height: 100%;
+  width: 300px;
+  position: fixed;
+  left: 299px;
+  top: 0;
+  overflow: scroll;
+  background: #fff;
+  padding: 30px 15px;
+  border: 1px solid #E5E5E5;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  opacity: 0;
+
+  transition: opacity 0.2s;
+}

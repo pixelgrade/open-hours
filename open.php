@@ -8,7 +8,7 @@
 /*
 Plugin Name: Open
 Plugin URI: https://pixelgrade.com
-Description: A plugin where your site's user can subscribe to receive newsletters.
+Description: An easy to use opening hours WordPress plugin manager for any kind of venue.
 Author: pixelgrade
 Version: 1.0
 Author URI: https://pixelgrade.com
@@ -35,7 +35,7 @@ $open_plugin = OpenPlugin();
  *
  * @see add_action( 'activated_plugin' ) && add_action( 'deactivated_plugin' ) Hooked into both.
  */
-function load_my_plugin_last() {
+function oh_load_my_plugin_last() {
 	// Ensure path to this file is via main wp plugin path.
 	$wp_path_to_this_file = preg_replace( '/(.*)plugins\/(.*)$/', WP_PLUGIN_DIR . '/$2', __FILE__ );
 	$this_plugin          = plugin_basename( trim( $wp_path_to_this_file ) );
@@ -50,5 +50,5 @@ function load_my_plugin_last() {
 	}
 }
 
-add_action( 'activated_plugin', 'load_my_plugin_last' );
-add_action( 'deactivated_plugin', 'load_my_plugin_last' );
+add_action( 'activated_plugin', 'oh_load_my_plugin_last' );
+add_action( 'deactivated_plugin', 'oh_load_my_plugin_last' );

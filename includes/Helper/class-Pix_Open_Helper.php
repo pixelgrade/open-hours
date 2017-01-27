@@ -127,15 +127,21 @@ class Pix_Open_Helper {
 				break;
 			case 'today-start-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				$response       = $this->_parse_hours( $today_interval[0]['start'], $time_format );
+				if ($today_interval) {
+					$response       = $this->_parse_hours( $today_interval[0]['start'], $time_format );
+				}
 				break;
 			case 'today-end-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				$response       = $this->_parse_hours( $today_interval[0]['end'], $time_format );
+				if ($today_interval) {
+					$response       = $this->_parse_hours( $today_interval[0]['end'], $time_format );
+				}
 				break;
 			case 'next-start-time':
 				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
-				$response          = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
+				if ($next_day_interval){
+					$response          = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
+				}
 				break;
 			case 'next-end-time':
 				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );

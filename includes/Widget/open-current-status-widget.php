@@ -21,10 +21,32 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		register_rest_route( 'open_hours/v1', '/get_time', array(
 			'methods'  => 'GET',
 			'callback' => array( $this, 'get_time' ),
-//			'permission_callback' => array( $this, 'permission_nonce_callback' )
+			'permission_callback' => array( $this, 'permission_nonce_callback' )
 		) );
 	}
 
+	/**
+	 * @return false|int
+	 * Check the nonce
+	 */
+	function permission_nonce_callback() {
+		$nonce = '';
+
+		if ( isset( $_REQUEST['open_nonce'] ) ) {
+			$nonce = $_REQUEST['open_nonce'];
+		} elseif ( isset( $_POST['open_nonce'] ) ) {
+			$nonce = $_POST['open_nonce'];
+		}
+
+		return wp_verify_nonce( $nonce, 'open_rest' );
+	}
+
+	/**
+	 * @param $request
+	 *
+	 * @return WP_REST_Response
+	 * An endpoint that returns the time
+	 */
 	function get_time( $request ) {
 		$params = $request->get_body_params();
 

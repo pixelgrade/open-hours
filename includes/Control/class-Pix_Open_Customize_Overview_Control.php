@@ -13,7 +13,15 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 
 	public function __construct( $wp_customize, $setting_id, $args = array() ) {
 		parent::__construct( $wp_customize, $setting_id, $args );
-		$this->html = '<p>This will be the example here. To add html. dsadasdsa dasdasdadsadas dsaasdsa </p>';
+
+		ob_start();
+		?>
+		<p>This will be the example here. To add html. dsadasdsa dasdasdadsadas dsaasdsa </p>
+			<div class="preview_open_widget">
+				sadas
+			</div>
+		<?php
+		$this->html = ob_get_clean();
 	}
 
 	/**

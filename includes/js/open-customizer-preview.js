@@ -1,17 +1,5 @@
 (function ($, api) {
-	api.bind('preview-ready', function () {
-
-		// Listener for the Overview setting input
-		// api('open_hours_overview_setting', function (setting) {
-		// 	setting.bind(function (value) {
-		// 		$('.open_overview_widget-schedule').empty();
-		// 		var something = prettyHoursParser(value);
-		// 		$.each(something, function (key, value) {
-		// 			$('.open_overview_widget-schedule').append(key + ' - ' + value + '<br />');
-		// 		});
-		// 	});
-		// });
-
+	api.bind('preview-ready', function () {console.log(open_hours);
 		// The IDs of all our widgets
 		let open_widgets = open_hours.widget_ids;
 
@@ -51,8 +39,14 @@
 
 					if (widgetValues !== 'undefined' && widgetValues['widget_id'] && widgetValues['widget_id'].includes('open_overview_widget')) {
 						$.get({
-							url: 'http://whatever.dev/wp-json/open_hours/v1/get_schedule_content',
-							data: {values: widgetValues},
+							url: open_hours.wp_rest.root + 'open_hours/v1/get_schedule_content',
+							beforeSend: function (xhr) {
+								xhr.setRequestHeader('X-WP-Nonce', open_hours.wp_rest.nonce);
+							},
+							data: {
+								'open_nonce': open_hours.wp_rest.open_nonce,
+								values: widgetValues
+							},
 							success: function (e) {
 								$('#' + widgetValues['widget_id'] + ' .widget-title + table').replaceWith(e);
 							}
@@ -88,21 +82,25 @@
 				let regex = /\{(.*?)\}/g,
 					occurences = string.match(regex).length,
 					match;
-				console.log(occurences);
 
 				for (let i = 0; i < occurences; i++) {
 					match = /\{(.*?)\}/.exec(string);
 					$.get({
 						url: 'http://whatever.dev/wp-json/open_hours/v1/get_time',
-						data: {value: match[1]},
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader('X-WP-Nonce', open_hours.wp_rest.nonce);
+						},
+						data: {
+							'open_nonce': open_hours.wp_rest.open_nonce,
+							value: match[1]
+						},
 						dataType: 'jsonp',
 						async: false,
 						success: function (json) {
 							console.log(json);
 
 						},
-						error: function (data) {
-							console.log(data);
+						error: function (data) {;
 							if (data.status == 200) {
 								string = string.replace(/\{(.*?)\}/, data.responseText);
 							}
@@ -118,80 +116,6 @@
 
 		function isOdd(num) {
 			return num % 2;
-		}
-
-		// An overly complicated function that parses the dates from the json in the User friendly strings
-		function prettyHoursParser(json) {
-			var finalArray = {
-				'monday': 'closed',
-				'tuesday': 'closed',
-				'wednesday': 'closed',
-				'thursday': 'closed',
-				'friday': 'closed',
-				'saturday': 'closed',
-				'sunday': 'closed',
-			};
-
-			try {
-				var jsonArray = JSON.parse(json);
-
-				if (jsonArray) {
-					var timeframes = jsonArray['timeframes'];
-					for (var i = 0; i < timeframes.length; i++) {
-						for (var j = 0; j < timeframes[i]['days'].length; j++) {
-							var start = parseTime(timeframes[i]['open'][0]['start']);
-							var end = parseTime(timeframes[i]['open'][0]['end']);
-
-							//change this to something better
-							switch (timeframes[i]['days'][j]) {
-								case 1:
-									finalArray['monday'] = start + ' - ' + end;
-									break;
-								case 2:
-									finalArray['tuesday'] = start + ' - ' + end;
-									break;
-								case 3:
-									finalArray['wednesday'] = start + ' - ' + end;
-									break;
-								case 4:
-									finalArray['thursday'] = start + ' - ' + end;
-									break;
-								case 5:
-									finalArray['friday'] = start + ' - ' + end;
-									break;
-								case 6:
-									finalArray['saturday'] = start + ' - ' + end;
-									break;
-								case 7:
-									finalArray['sunday'] = start + ' - ' + end;
-									break;
-								default:
-									break;
-							}
-
-						}
-					}
-				}
-			} catch (e) {
-				console.log(e.message);
-			}
-
-			return finalArray;
-		}
-
-		function parseTime(timeString) {
-			if (timeString.match(/^\+/)) {
-				timeString = timeString.replace(/^\+/, '');
-				timeString = timeString.match(/../g).join(':');
-			} else {
-				if (timeString.match(/^0/)) {
-					timeString = timeString.match(/../g).join(':');
-				} else {
-					timeString = timeString.match(/../g).join(':');
-				}
-			}
-
-			return timeString;
 		}
 
 		function create_open_customizer_id(widgetId) {
