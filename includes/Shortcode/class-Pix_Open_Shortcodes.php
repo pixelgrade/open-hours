@@ -7,7 +7,7 @@ class Pix_Open_Shortcodes {
 	}
 
 	/**
-	 * ['open-overview-shortcode'] shortcodes
+	 * ['opening-hours-overview'] shortcodes
 	 */
 	function add_open_overview_shortcodes( $atts, $content = null ) {
 
@@ -103,7 +103,7 @@ class Pix_Open_Shortcodes {
 	}
 
 	/**
-	 * ['open-current-status'] shortcodes
+	 * ['opening-hours-current-status'] shortcodes
 	 */
 	function add_current_status_shortcode( $atts ) {
 		$a = shortcode_atts(

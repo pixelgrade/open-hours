@@ -35,12 +35,12 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		}
 
 		if ( isset( $params['overview_option'] ) && ! empty( $params['overview_option'] ) ) {
-			$shortcode = do_shortcode( '[open-overview-shortcode ' . 'overview_option=' . base64_encode( $params['overview_option'] ) . ']' );
+			$shortcode = do_shortcode( '[opening-hours-overview ' . 'overview_option=' . base64_encode( $params['overview_option'] ) . ']' );
 		} elseif ( isset( $params['values'] ) ) {
 			$time_format  = $params['values']['time_format'];
 			$closed_label = $params['values']['closed_label'];
 
-			$shortcode = do_shortcode( '[open-overview-shortcode ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
+			$shortcode = do_shortcode( '[opening-hours-overview ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
 		}
 
 		wp_send_json( $shortcode );
@@ -69,6 +69,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 			'caption' => __( 'Title', 'open_hours' )
 		) );
 
+
 		$this->addField( 'compress_opening_hours', array(
 			'type'    => 'checkbox',
 			'caption' => __( 'Compress Opening Hours', 'open_hours' )
@@ -87,6 +88,15 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		$this->addField( 'time_format', array(
 			'type'    => 'text',
 			'caption' => __( 'Time Format', 'open_hours' )
+		) );
+
+		$this->addField( 'time_format_foot', array(
+			'type'    => 'description',
+			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
+			'notes'   => array(
+				'header' => _( '<a href="#">Learn more about time formatting</a>' ),
+				'footer' => ''
+			)
 		) );
 
 		$this->addField( 'short_day_name', array(

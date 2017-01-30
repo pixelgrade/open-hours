@@ -46,7 +46,6 @@ function oh_load_my_plugin_last() {
 		array_splice( $active_plugins, $this_plugin_key, 1 );
 		array_push( $active_plugins, $this_plugin );
 		update_option( 'active_plugins', $active_plugins );
-
 	}
 }
 
