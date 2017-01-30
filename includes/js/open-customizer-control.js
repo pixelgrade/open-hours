@@ -30,5 +30,9 @@
 
 			return true;
 		});
+
+		$( '[id*="open_hours_overview_section"] > *:first-child' ).on( 'click', function() {
+			$( '.wp-full-overlay' ).toggleClass( 'is--open-hours-section-expanded' );
+		} );
 	});
 })(jQuery, wp.customize);

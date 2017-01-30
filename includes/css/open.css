@@ -4,23 +4,28 @@ li[id*=open_hours_overview] .widget-control-actions {
 li[id*=open_hours_overview] .widget-top a.widget-action:after {
   content: "\f139"; }
 
-li[id*=open_hours_overview].expanded .preview_open_widget {
-  opacity: 1 !important;
-  transition: opacity 0.2s; }
-
-li[id*=open_hours_overview].expanded a.widget-action:after {
-  content: "\f141"; }
-
 .preview_open_widget {
-  height: 100%;
-  width: 300px;
   position: fixed;
   left: 299px;
   top: 0;
-  overflow: scroll;
-  background: #fff;
+  z-index: -1;
   padding: 30px 15px;
-  border: 1px solid #E5E5E5;
+  height: 100%;
+  width: 300px;
+  box-sizing: border-box;
+  overflow: scroll;
+  border: 1px solid #ddd;
   border-top-width: 0;
   border-bottom-width: 0;
-  transition: opacity 0.2s; }
+  background-color: #eee;
+  transform: translateX(-300px);
+  transition: transform 0.2s ease-in-out; }
+
+.wp-full-overlay {
+  transition: .2s margin ease-in-out; }
+
+.wp-full-overlay.is--open-hours-section-expanded {
+  margin-left: 600px;
+  margin-right: -300px; }
+  .wp-full-overlay.is--open-hours-section-expanded .preview_open_widget {
+    transform: translateX(0); }
