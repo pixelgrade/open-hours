@@ -39,7 +39,16 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			</ol>
 		</div>
 		<div class="preview_open_widget">
-			sadas
+			<?php
+			$opening_hours_option = get_option('open_hours_overview_setting');
+
+			if ($opening_hours_option) {
+				echo do_shortcode( '[opening-hours-overview ' . 'overview_option=' . base64_encode($opening_hours_option) . ']' );
+			} else {
+				echo __('You have not setup a schedule yet.');
+			}
+
+			?>
 		</div>
 		<?php
 		$this->html = ob_get_clean();

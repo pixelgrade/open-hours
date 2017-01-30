@@ -1,5 +1,5 @@
 (function ($, api) {
-	api.bind('preview-ready', function () {console.log(open_hours);
+	api.bind('preview-ready', function () {
 		// The IDs of all our widgets
 		let open_widgets = open_hours.widget_ids;
 

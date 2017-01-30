@@ -44,10 +44,9 @@ class OpenPlugin {
 		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 
 		add_action( 'customize_preview_init', array( $this, 'enqueue_customizer_preview_scripts' ), 99999 );
+		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
 
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
-		add_action( 'customize_register', array( $this, 'open_customizer_register' ) );
-		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
 
 		// Add this as shortcode
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
@@ -93,7 +92,7 @@ class OpenPlugin {
 	 */
 	public function enqueue_styles() {
 //		if ( $this->is_pixelgrade_care_dashboard() ) {
-			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
 //		}
 	}
 
@@ -162,11 +161,40 @@ class OpenPlugin {
 		OpenOverview_Widget::registerWidget();
 	}
 
+	/**
+	 * @param string $key
+	 * Localize js
+	 */
+	function localize_preview_js_data( $key = 'open-customizer-preview' ) {
+		$this->_create_customizer_widget_ids( 'OpenCurrentStatus_Widget' );
+		$this->_create_customizer_widget_ids( 'OpenOverview_Widget' );
 
-	function open_customizer_register( WP_Customize_Manager $wp_customize ) {
-		// Change transport for this widget to postMessage
-		$this->_set_post_message_transport( 'OpenCurrentStatus_Widget', $wp_customize );
-		$this->_set_post_message_transport( 'OpenOverview_Widget', $wp_customize );
+		$localized_data = array(
+			'widget_ids' => $this->widget_ids,
+			'wp_rest'    => array(
+				'root'       => esc_url_raw( rest_url() ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'open_nonce' => wp_create_nonce( 'open_rest' )
+			),
+		);
+
+		wp_localize_script( $key, 'open_hours', $localized_data );
+	}
+
+	/**
+	 * @param string $key
+	 * Localize js
+	 */
+	function localize_control_js_data( $key = 'open-customizer-control' ) {
+		$localized_data = array(
+			'wp_rest' => array(
+				'root'       => esc_url_raw( rest_url() ),
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'open_nonce' => wp_create_nonce( 'open_rest' )
+			),
+		);
+
+		wp_localize_script( $key, 'open_hours_control', $localized_data );
 	}
 
 	/**
@@ -177,7 +205,9 @@ class OpenPlugin {
 	 *
 	 * @return string
 	 */
-	function _set_post_message_transport( $widget_class, $wp_customize ) {
+	function _create_customizer_widget_ids( $widget_class ) {
+		global $wp_customize;
+
 		$current_widget = $GLOBALS['wp_widget_factory']->widgets[ $widget_class ];
 		$manager        = new WP_Customize_Widgets( $wp_customize );
 
@@ -209,40 +239,4 @@ class OpenPlugin {
 			}
 		}
 	}
-
-
-	/**
-	 * @param string $key
-	 * Localize js
-	 */
-	function localize_preview_js_data( $key = 'open-customizer-preview' ) {
-
-		$localized_data = array(
-			'widget_ids' => $this->widget_ids,
-			'wp_rest'            => array(
-				'root'                  => esc_url_raw( rest_url() ),
-				'nonce'                 => wp_create_nonce( 'wp_rest' ),
-				'open_nonce'            => wp_create_nonce( 'open_rest' )
-			),
-		);
-
-		wp_localize_script( $key, 'open_hours', $localized_data );
-	}
-
-	/**
-	 * @param string $key
-	 * Localize js
-	 */
-	function localize_control_js_data( $key = 'open-customizer-control' ) {
-		$localized_data = array(
-			'wp_rest'            => array(
-				'root'                  => esc_url_raw( rest_url() ),
-				'nonce'                 => wp_create_nonce( 'wp_rest' ),
-				'open_nonce'            => wp_create_nonce( 'open_rest' )
-			),
-		);
-
-		wp_localize_script( $key, 'open_hours_control', $localized_data );
-	}
-
 }
