@@ -1,1 +1,28 @@
 @import 'preview';
+
+.open-section {
+    margin-bottom: 60px;
+}
+
+.open-example {
+    margin-bottom: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+
+    font-style: italic;
+    line-height: 18px;
+
+    color: #565D66;
+    background-color: #DEDEDE;
+}
+
+.open-list {
+    counter-reset: the-counter;
+    margin-left: 0;
+    list-style: none;
+
+    li:before {
+        content: counter(the-counter) '.';
+        counter-increment: the-counter;
+    }
+}

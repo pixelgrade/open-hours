@@ -10,22 +10,86 @@ li[id*=open_hours_overview] .widget-top a.widget-action:after {
   top: 0;
   z-index: -1;
   padding: 30px 15px;
+  padding-top: 64px;
   height: 100%;
   width: 300px;
-  box-sizing: border-box;
   overflow: scroll;
   border: 1px solid #ddd;
   border-top-width: 0;
   border-bottom-width: 0;
   background-color: #eee;
+  opacity: 0;
   transform: translateX(-300px);
-  transition: transform 0.2s ease-in-out; }
+  transition: opacity, transform 0.2s ease-in-out; }
+  .preview_open_widget,
+  .preview_open_widget * {
+    box-sizing: border-box; }
 
 .wp-full-overlay {
   transition: .2s margin ease-in-out; }
 
 .wp-full-overlay.is--open-hours-section-expanded {
-  margin-left: 600px;
+  margin-left: 599px;
   margin-right: -300px; }
   .wp-full-overlay.is--open-hours-section-expanded .preview_open_widget {
+    opacity: 1;
     transform: translateX(0); }
+
+.open-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 12px;
+  border-bottom: 1px solid #DDDDDD;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  color: #585858;
+  background-color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600; }
+
+.open_overview_shortcode {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #DDDDDD; }
+  .open_overview_shortcode tr {
+    border-bottom: 1px solid #DDDDDD;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    background-color: #FFFFFF; }
+    .open_overview_shortcode tr:last-child {
+      border-bottom: 0; }
+  .open_overview_shortcode td {
+    padding: 12px 14px; }
+
+.open-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; }
+
+.open-entry__day {
+  font-weight: 600;
+  font-size: 14px; }
+
+.open-entry__hours-schedule,
+.open-entry__hours-closed {
+  text-align: left; }
+
+.open-section {
+  margin-bottom: 60px; }
+
+.open-example {
+  margin-bottom: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-style: italic;
+  line-height: 18px;
+  color: #565D66;
+  background-color: #DEDEDE; }
+
+.open-list {
+  counter-reset: the-counter;
+  margin-left: 0;
+  list-style: none; }
+  .open-list li:before {
+    content: counter(the-counter) ".";
+    counter-increment: the-counter; }

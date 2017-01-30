@@ -1,7 +1,7 @@
 (function ($, api) {
 	api.bind('ready', function () {
 		console.log(open_hours_control);
-		$('#open_hours_overview-dummy').on('change', function(e){
+		$('#open_hours_overview-dummy').on('keyup', function(e) {
 			e.preventDefault();
 			var currentValue = $(this).val();
 			var hours = fourSq.util.HoursParser.parse(currentValue);

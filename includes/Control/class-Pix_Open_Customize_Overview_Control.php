@@ -16,9 +16,9 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 
 		ob_start();
 		?>
-		<div id="oh-overview-description">
+		<div id="oh-overview-description" class="open-section">
 			<p>Example:</p>
-			<div>
+			<div class="open-example">
 				Monday 10am - 3pm<br/>
 				Tuesday to Friday 9 - 17<br/>
 				Sat to Sun - 2am<br/>
@@ -26,19 +26,24 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			<a href="#">Learn more about</a> setting hours.
 		</div>
 
-		<div>
+		<div class="open-section">
 			<h3>Displaying the opening hours</h3>
 			<p>There are two ways to display: </p>
-			<ol>
-				<li><strong>Opening Hours Widget</strong></li>
-				<p>Use the two "Opening Hours" widgets available to display an overview of the opening hours or the current status of your venuie (open or closed).</p>
-				<li><strong>Shortcode</strong></li>
-				<p>Use the shortcodes below in a page content:</p>
-				[opening-hours-overview]
-				[opening-hours-current-status]
+			<ol class="open-list">
+				<li>
+                    <strong>Opening Hours Widget</strong>
+                    <p>Use the two "Opening Hours" widgets available to display an overview of the opening hours or the current status of your venuie (open or closed).</p>
+                </li>
+				<li>
+                    <strong>Shortcode</strong>
+                    <p>Use the shortcodes below in a page content:</p>
+                    <div class="open-example">[opening-hours-overview]</div>
+                    <div class="open-example">[opening-hours-current-status]</div>
+                </li>
 			</ol>
 		</div>
 		<div class="preview_open_widget">
+            <div class="open-preview"><?php echo __('Preview'); ?></div>
 			<?php
 			$opening_hours_option = get_option('open_hours_overview_setting');
 
