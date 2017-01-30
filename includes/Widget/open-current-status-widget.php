@@ -152,7 +152,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? esc_attr( $new_instance['open_note'] ) : '';
 		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? esc_attr( $new_instance['closed_note'] ) : '';
-		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
+		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : 'g:i a';
 		$instance['use_short_day_name']         = ( ! empty( $new_instance['use_short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']   = $this->getWidgetId();
 

@@ -9,7 +9,7 @@
 
 			// Handle Preview
 			$.get({
-				url: 'http://whatever.dev/wp-json/open_hours/v1/get_schedule_content',
+				url: open_hours_control.wp_rest.root + 'open_hours/v1/get_schedule_content',
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader('X-WP-Nonce', open_hours_control.wp_rest.nonce);
 				},
