@@ -34,8 +34,8 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 				<p>Use the two "Opening Hours" widgets available to display an overview of the opening hours or the current status of your venuie (open or closed).</p>
 				<li><strong>Shortcode</strong></li>
 				<p>Use the shortcodes below in a page content:</p>
-				['opening-hours-overview']
-				['opening-hours-current-status']
+				[opening-hours-overview]
+				[opening-hours-current-status]
 			</ol>
 		</div>
 		<div class="preview_open_widget">

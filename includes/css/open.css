@@ -1,18 +1,15 @@
-li[id*=spotlights] .widget-control-actions {
+li[id*=open_hours_overview] .widget-control-actions {
   margin-top: 10px; }
 
-li[id*=spotlights] .widget-top a.widget-action:after {
+li[id*=open_hours_overview] .widget-top a.widget-action:after {
   content: "\f139"; }
 
-li[id*=spotlights].expanded .preview_open_widget {
+li[id*=open_hours_overview].expanded .preview_open_widget {
   opacity: 1 !important;
   transition: opacity 0.2s; }
 
-li[id*=spotlights].expanded a.widget-action:after {
+li[id*=open_hours_overview].expanded a.widget-action:after {
   content: "\f141"; }
-
-.wp-full-overlay-sidebar-content {
-  overflow-y: visible !important; }
 
 .preview_open_widget {
   height: 100%;
@@ -26,5 +23,4 @@ li[id*=spotlights].expanded a.widget-action:after {
   border: 1px solid #E5E5E5;
   border-top-width: 0;
   border-bottom-width: 0;
-  opacity: 0;
   transition: opacity 0.2s; }
