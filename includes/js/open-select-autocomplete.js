@@ -13,10 +13,28 @@
 				{ value: "{next-end-time}" }
 		];
 
-//		$('.js-time-autocomplete').each( function() {
-//			$( this ).autocomplete({
-//				lookup: timeTags
-//			});
+//		$('#widget-21_open_current_status_widget-5').bind('expand', function(){
+//			console.log('expanded');
+//		}).bind('collapse', function() {
+//			console.log('collapsed');
+//		});
+//
+//		$('#widget-21_open_current_status_widget-5').on('wp-collapse-menu', function(){
+//			console.log('collapse menu');
+//		});
+//
+//		$('#widget-21_open_current_status_widget-5').on('click', function(){
+//			console.log('click');
+//		});
+//
+//		$('div[id*="_open_current_status_"]').on('click', function() {
+//			let testing = $('#' + $(this).attr('id') + ' .widefat');
+//
+//			testing.each(function(key, value){
+//				let id = value.getAttribute('id');
+//				$('#' + id).easyAutocomplete( options );
+//			})
+//
 //		});
 
 		function split( val ) {
