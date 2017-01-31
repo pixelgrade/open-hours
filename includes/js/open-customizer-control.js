@@ -57,23 +57,5 @@
 			$wpOverlay.removeClass( 'show-open-hours-scheme' );
 		} )
 
-		var options = {
-			data: [
-				{ value: "{time}" },
-				{ value: "{today}" },
-				{ value: "{current-day}" },
-				{ value: "{today-time}" },
-				{ value: "{today-start-time}" },
-				{ value: "{today-end-time}" },
-				{ value: "{next-day}" },
-				{ value: "{next-time}" },
-				{ value: "{next-start-time}" },
-				{ value: "{next-end-time}" },
-			],
-
-			getValue: "value",
-		};
-
-		$( '#widget-open_current_status_widget-4-open_note' ).easyAutocomplete( options );
 	});
 })(jQuery, wp.customize);

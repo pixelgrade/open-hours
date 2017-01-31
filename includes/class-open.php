@@ -48,6 +48,9 @@ class OpenPlugin {
 
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 
+		add_action( 'admin_init', array( $this, 'enqueue_customizer_control_scripts' ) );
+		add_action( 'admin_init', array( $this, 'enqueue_styles' ) );
+
 		// Add this as shortcode
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
 		$shortcodes = new Pix_Open_Shortcodes();
@@ -62,16 +65,21 @@ class OpenPlugin {
 	 * Enqueue control scripts
 	 */
 	public function enqueue_customizer_control_scripts() {
+		if ( !$this->is_widget_section() ) {
+
+			wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
+				'jquery',
+				'wp-util'
+			), $this->plugin_version, true );
+			wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+		}
 
 		wp_enqueue_script( 'open-customizer-select2', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array(
 			'jquery',
 		), $this->plugin_version, true );
 
-		wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
-			'jquery',
-			'wp-util'
-		), $this->plugin_version, true );
-		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+		// Load only if we are on the widgets page or in the customizer
+		wp_enqueue_script( 'open-select-autocomplete', plugin_dir_url( __FILE__ ) . 'js/open-select-autocomplete.js' );
 
 		$this->localize_control_js_data();
 	}
@@ -95,10 +103,8 @@ class OpenPlugin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-//		if ( $this->is_pixelgrade_care_dashboard() ) {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all' );
-//		}
 	}
 
 	/**
@@ -244,4 +250,13 @@ class OpenPlugin {
 			}
 		}
 	}
+
+	function is_widget_section() {
+		if ( is_admin() ) {
+			return true;
+		}
+
+		return false;
+	}
+
 }

@@ -19,8 +19,8 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	function add_rest_routes_api() {
 		//The Following registers an api route with multiple parameters.
 		register_rest_route( 'open_hours/v1', '/get_schedule_content', array(
-			'methods'  => 'GET',
-			'callback' => array( $this, 'get_schedule_content' ),
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_schedule_content' ),
 			'permission_callback' => array( $this, 'permission_nonce_callback' )
 		) );
 	}
@@ -196,7 +196,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		$instance['compress_opening_hours'] = ( ! empty( $new_instance['compress_opening_hours'] ) ) ? '1' : '0';
 		$instance['hide_closed_days']       = ( ! empty( $new_instance['hide_closed_days'] ) ) ? '1' : '0';
 		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : '';
-		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : '';
+		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : 'g:i a';
 		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']              = $this->getWidgetId();
 
