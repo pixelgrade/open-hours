@@ -119,8 +119,8 @@ class Pix_Open_Shortcodes {
 
 		ob_start();
 		?>
-		<div id=<?php echo $open_note_id ?>><?php echo esc_attr( $open_note ); ?></div>
-		<div id=<?php echo $close_note_id ?>><?php echo esc_attr( $closed_note ); ?></div>
+		<div id="<?php echo $open_note_id ?>" class="opening-hours-note--open"><?php echo esc_attr( $open_note ); ?></div>
+		<div id="<?php echo $close_note_id ?>" class="opening-hours-note--closed"><?php echo esc_attr( $closed_note ); ?></div>
 		<?php
 
 		return ob_get_clean();

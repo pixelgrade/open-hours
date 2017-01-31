@@ -87,7 +87,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 				'header' => 'It\'s {time} and we\'re Open until {today-end-time}',
 				'footer' => '{time} - It\'s today, we\'re Open.'
 			),
-			'css_class'     => 'open-example'
+			'css_class'     => 'opening-hours-example'
 		) );
 
 		$this->addField( 'closed_note', array(
@@ -102,7 +102,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 				'header' => 'We\'re closed until {next-day} at {next-time}',
 				'footer' => '{time} - it\'s closed now'
 			),
-			'css_class'     => 'open-example'
+			'css_class'     => 'opening-hours-example'
 		) );
 
 
