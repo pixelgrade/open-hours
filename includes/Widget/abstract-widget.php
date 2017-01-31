@@ -130,16 +130,16 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				break;
 			case 'description':
 				?>
-				<div style=<?php if ( isset( $field['css'] ) ) {
-					echo $field['css'];
-				}; ?>><?php echo $field['notes']['header'] ?></div>
+				<div class="<?php if ( isset( $field['css_class'] ) ) {
+					echo $field['css_class'];
+				}; ?>"><?php echo $field['notes']['header'] ?></div>
 				<br/>
 				<?php
 				if ( isset( $field['notes'] ) && $field['notes']['footer'] ) {
 					?>
-					<div style=<?php if ( isset( $field['css'] ) ) {
-						echo $field['css'];
-					}; ?>><?php echo $field['notes']['footer'] ?></div>
+					<div class="<?php if ( isset( $field['css_class'] ) ) {
+						echo $field['css_class'];
+					}; ?>"><?php echo $field['notes']['footer'] ?></div>
 					<?php
 				}
 				break;

@@ -63,6 +63,10 @@ class OpenPlugin {
 	 */
 	public function enqueue_customizer_control_scripts() {
 
+		wp_enqueue_script( 'open-customizer-select2', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array(
+			'jquery',
+		), $this->plugin_version, true );
+
 		wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
 			'jquery',
 			'wp-util'
@@ -93,6 +97,7 @@ class OpenPlugin {
 	public function enqueue_styles() {
 //		if ( $this->is_pixelgrade_care_dashboard() ) {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all' );
 //		}
 	}
 

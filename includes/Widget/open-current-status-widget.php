@@ -71,7 +71,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'caption' => __( 'Title foot note', 'text_domain' ),
 			'notes'   => array(
 				'header' => 'Write the "Open" and "Closed" messages using the tags displayed below.',
-				'footer' => _( 'See <a href="#">available tags</a> scheme.' )
+				'footer' => _( 'See <a href="#" class="js-show-hours-scheme">available tags</a> scheme.' )
 			)
 		) );
 
@@ -87,7 +87,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 				'header' => 'It\'s {time} and we\'re Open until {today-end-time}',
 				'footer' => '{time} - It\'s today, we\'re Open.'
 			),
-			'css'     => 'background-color:#F4F4F4;font-style:italic;'
+			'css_class'     => 'open-example'
 		) );
 
 		$this->addField( 'closed_note', array(
@@ -102,7 +102,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 				'header' => 'We\'re closed until {next-day} at {next-time}',
 				'footer' => '{time} - it\'s closed now'
 			),
-			'css'     => 'background-color:#F4F4F4;font-style:italic;'
+			'css_class'     => 'open-example'
 		) );
 
 
@@ -115,7 +115,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'type'    => 'description',
 			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
 			'notes'   => array(
-				'header' => _( '<a href="#">Learn more about time formatting</a>' ),
+				'header' => _( '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">Learn more about time formatting</a>' ),
 				'footer' => ''
 			)
 		) );

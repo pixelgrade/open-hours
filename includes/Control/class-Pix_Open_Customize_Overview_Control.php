@@ -23,7 +23,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 				Tuesday to Friday 9 - 17<br/>
 				Sat to Sun - 2am<br/>
 			</div>
-			<a href="#">Learn more about</a> setting hours.
+			<a href="#" class="js-show-hours-scheme">Learn more about</a> setting hours.
 		</div>
 
 		<div class="open-section">

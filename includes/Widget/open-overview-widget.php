@@ -94,7 +94,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 			'type'    => 'description',
 			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
 			'notes'   => array(
-				'header' => _( '<a href="#">Learn more about time formatting</a>' ),
+				'header' => _( '<a href="#" class="js-show-hours-scheme">Learn more about time formatting</a>' ),
 				'footer' => ''
 			)
 		) );

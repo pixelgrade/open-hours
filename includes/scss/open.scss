@@ -11,14 +11,17 @@
 
 .open-example {
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 6px 8px;
     box-sizing: border-box;
+
+    overflow-x: scroll;
+    white-space: nowrap;
 
     font-style: italic;
     line-height: 18px;
 
     color: #565D66;
-    background-color: #DEDEDE;
+    background-color: #f4f4f4;
 }
 
 .open-list {
@@ -29,5 +32,30 @@
     li:before {
         content: counter(the-counter) '.';
         counter-increment: the-counter;
+    }
+}
+
+.open-scheme {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+
+    background: url('../images/opening_hours_scheme.png') #ffffff center center no-repeat;
+    background-size: auto auto;
+
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    pointer-events: none;
+
+    .show-open-hours-scheme & {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .is--open-hours-section-expanded & {
+        left: -300px;
     }
 }
