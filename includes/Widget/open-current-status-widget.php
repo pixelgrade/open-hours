@@ -77,6 +77,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
 		$this->addField( 'open_note', array(
 			'type'    => 'text',
+			'css_class' => 'js-time-autocomplete',
 			'caption' => __( 'Open Note', 'text_domain' )
 		) );
 
@@ -92,6 +93,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
 		$this->addField( 'closed_note', array(
 			'type'    => 'text',
+			'css_class' => 'js-time-autocomplete',
 			'caption' => __( 'Closed Note', 'text_domain' )
 		) );
 

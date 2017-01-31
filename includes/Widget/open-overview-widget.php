@@ -82,6 +82,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 
 		$this->addField( 'closed_label', array(
 			'type'    => 'text',
+			'css_class' => 'js-time-autocomplete',
 			'caption' => __( 'Closed Label', 'open_hours' )
 		) );
 

@@ -29,7 +29,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 		<div class="opening-hours-section">
 			<h3>Displaying the opening hours</h3>
 			<p>There are two ways to display: </p>
-			<ol class="open-list">
+			<ol class="opening-hours-list">
 				<li>
                     <strong>Opening Hours Widget</strong>
                     <p>Use the two "Opening Hours" widgets available to display an overview of the opening hours or the current status of your venuie (open or closed).</p>

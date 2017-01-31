@@ -39,7 +39,7 @@
 		} );
 
 		// Add a div with the Open Hours Scheme
-		$wpOverlay.prepend( $('<div class="open-scheme"></div>') );
+		$wpOverlay.prepend( $('<div class="opening-hours-timestamps-explained"></div>') );
 
 		// Show the Open Hours Scheme
 		$( document ).on( 'click', '.js-show-hours-scheme', function( event ) {

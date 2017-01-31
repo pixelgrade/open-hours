@@ -74,7 +74,7 @@ class OpenPlugin {
 			wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
 		}
 
-		wp_enqueue_script( 'open-customizer-select2', plugin_dir_url( __FILE__ ) . 'js/jquery.easy-autocomplete.min.js', array(
+		wp_enqueue_script( 'open-customizer-select2', plugin_dir_url( __FILE__ ) . 'js/jquery.autocomplete.min.js', array(
 			'jquery',
 		), $this->plugin_version, true );
 
@@ -104,7 +104,6 @@ class OpenPlugin {
 	 */
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/easy-autocomplete.min.css', array(), $this->version, 'all' );
 	}
 
 	/**

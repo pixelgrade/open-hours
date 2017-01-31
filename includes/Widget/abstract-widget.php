@@ -113,7 +113,8 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				?>
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
-					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
+					<input id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
+                           class="widefat<?php if( ! empty ( $field['css_class'] ) ) { echo '  ' . $field['css_class']; } ?>"
 					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="text"
 					       value="<?php echo esc_attr( $value ); ?>">
 				</p>
