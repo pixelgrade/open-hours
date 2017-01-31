@@ -106,7 +106,7 @@ class OpenPlugin {
 
 		// Add our section to the customizer
 		$wp_customize->add_section( 'open_hours_overview_section', array(
-			'title'    => __( 'Opening Hours', 'open_hours' ),
+			'title'    => __( '🕒 &nbsp;Opening Hours', 'open_hours' ),
 			'priority' => 9999,
 		) );
 
@@ -125,7 +125,7 @@ class OpenPlugin {
 			'open_hours_overview_setting',
 			array(
 				'section'     => 'open_hours_overview_section',
-				'description' => __( 'something something in the month of may 1' )
+				'description' => __( 'Write your opening hours in a simple human readable format:' )
 			)
 		);
 

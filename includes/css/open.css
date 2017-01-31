@@ -74,6 +74,10 @@ li[id*=open_hours_overview] .widget-top a.widget-action:after {
 .open-entry__hours-closed {
   text-align: left; }
 
+#open-customize-control-open_hours_overview_setting .customize-control-description {
+  margin-bottom: 10px;
+  font-style: normal; }
+
 .open-section {
   margin-bottom: 60px; }
 
