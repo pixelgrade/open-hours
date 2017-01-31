@@ -16,9 +16,9 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 
 		ob_start();
 		?>
-		<div id="oh-overview-description" class="open-section">
+		<div id="oh-overview-description" class="opening-hours-section">
 			<p>Example:</p>
-			<div class="open-example">
+			<div class="opening-hours-example">
 				Monday 10am - 3pm<br/>
 				Tuesday to Friday 9 - 17<br/>
 				Sat to Sun - 2am<br/>
@@ -26,7 +26,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			<a href="#" class="js-show-hours-scheme">Learn more about</a> setting hours.
 		</div>
 
-		<div class="open-section">
+		<div class="opening-hours-section">
 			<h3>Displaying the opening hours</h3>
 			<p>There are two ways to display: </p>
 			<ol class="open-list">
@@ -37,13 +37,13 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 				<li>
                     <strong>Shortcode</strong>
                     <p>Use the shortcodes below in a page content:</p>
-                    <div class="open-example">[opening-hours-overview]</div>
-                    <div class="open-example">[opening-hours-current-status]</div>
+                    <div class="opening-hours-example">[opening-hours-overview]</div>
+                    <div class="opening-hours-example">[opening-hours-current-status]</div>
                 </li>
 			</ol>
 		</div>
 		<div class="preview_open_widget">
-            <div class="open-preview"><?php echo __('Preview'); ?></div>
+            <div class="opening-hours-preview-headline"><?php echo __('Preview'); ?></div>
 			<?php
 			$opening_hours_option = get_option('open_hours_overview_setting');
 

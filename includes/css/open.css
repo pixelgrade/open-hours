@@ -78,10 +78,10 @@ li[id*=open_hours_overview] .widget-top a.widget-action:after {
   margin-bottom: 10px;
   font-style: normal; }
 
-.open-section {
+.opening-hours-section {
   margin-bottom: 60px; }
 
-.open-example {
+.opening-hours-example {
   margin-bottom: 10px;
   padding: 6px 8px;
   box-sizing: border-box;
