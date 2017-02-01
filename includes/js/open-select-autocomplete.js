@@ -13,21 +13,18 @@
 				{ value: "{next-end-time}" }
 		];
 
-//		$('.js-time-autocomplete').each( function() {
-//			$( this ).autocomplete({
-//				lookup: timeTags
-//			});
-//		});
-
 		function split( val ) {
 			return val.split( / \s*/ );
 		}
 		function extractLast( term ) {
 			return split( term ).pop();
 		}
+		console.log($('div[id*="_open_current_status_"]'));
+
 
 		$( '.js-time-autocomplete' ).each( function (  ) {
 			// don't navigate away from the field on tab when selecting an item
+			console.log($(this));
 			$( this ).on( "keydown", function( event ) {
 				if ( event.keyCode === $.ui.keyCode.TAB &&
 				     $( this ).autocomplete( "instance" ).menu.active ) {

@@ -1,6 +1,5 @@
 (function ($, api) {
 	api.bind('ready', function () {
-		console.log(open_hours_control);
 		$('#open_hours_overview-dummy').on('keyup', function(e) {
 			e.preventDefault();
 			var currentValue = $(this).val();
@@ -55,7 +54,7 @@
 			event.stopPropagation();
 
 			$wpOverlay.removeClass( 'show-open-hours-scheme' );
-		} )
+		} );
 
 	});
 })(jQuery, wp.customize);
