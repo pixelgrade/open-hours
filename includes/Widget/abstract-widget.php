@@ -107,6 +107,11 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 	public function renderField( array $field, array $instance ) {
 		$value = array_key_exists( $field['name'], $instance ) ? $instance[ $field['name'] ] : null;
 
+		// Set a default value
+		if ( ! $value && isset( $field['default'] ) ) {
+			$value = $field['default'];
+		}
+
 		// Switch based on type
 		switch ( $field['type'] ) {
 			case 'text':
@@ -114,7 +119,9 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
 					<input id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
-                           class="widefat<?php if( ! empty ( $field['css_class'] ) ) { echo '  ' . $field['css_class']; } ?>"
+					       class="widefat<?php if ( ! empty ( $field['css_class'] ) ) {
+						       echo '  ' . $field['css_class'];
+					       } ?>"
 					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="text"
 					       value="<?php echo esc_attr( $value ); ?>">
 				</p>
@@ -125,7 +132,8 @@ abstract class OpenAbstract_Widget extends WP_Widget {
 				<p>
 					<label for="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"><?php esc_attr_e( $field['caption'], 'text_domain' ); ?></label>
 					<input class="checkbox" id="<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?>"
-					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox" value=<?php echo esc_attr( $this->get_field_id( $field['name'] ) );  ?> <?php checked(isset($instance[$field['name']]) ? $instance[$field['name']] : 0); ?>>
+					       name="<?php echo esc_attr( $this->get_field_name( $field['name'] ) ); ?>" type="checkbox"
+					       value=<?php echo esc_attr( $this->get_field_id( $field['name'] ) ); ?> <?php checked( isset( $instance[ $field['name'] ] ) ? $instance[ $field['name'] ] : 0 ); ?>>
 				</p>
 				<?php
 				break;
