@@ -10,7 +10,6 @@ class Pix_Open_Shortcodes {
 	 * ['opening-hours-overview'] shortcodes
 	 */
 	function add_open_overview_shortcodes( $atts, $content = null ) {
-
 		$overview_option = get_option( 'open_hours_overview_setting' );
 		$helper          = new Pix_Open_Helper();
 
@@ -102,6 +101,9 @@ class Pix_Open_Shortcodes {
 	 * ['opening-hours-current-status'] shortcodes
 	 */
 	function add_current_status_shortcode( $atts ) {
+		$helper          = new Pix_Open_Helper();
+		$helper->is_open();
+
 		$a = shortcode_atts(
 			array(
 				'open_note'   => isset( $atts['open_note'] ) ? $atts['open_note'] : '',
@@ -119,8 +121,13 @@ class Pix_Open_Shortcodes {
 
 		ob_start();
 		?>
-		<div id="<?php echo $open_note_id ?>" class="opening-hours-note  opening-hours-note--open"><?php echo esc_attr( $open_note ); ?></div>
-		<div id="<?php echo $close_note_id ?>" class="opening-hours-note  opening-hours-note--closed"><?php echo esc_attr( $closed_note ); ?></div>
+		<?php if ($helper->is_open()) { ?>
+			<div id="<?php echo $open_note_id ?>" class="opening-hours-note  opening-hours-note--open"><?php echo esc_attr( $open_note ); ?></div>
+		<?php } else { ?>
+			<div id="<?php echo $close_note_id ?>" class="opening-hours-note  opening-hours-note--closed"><?php echo esc_attr( $closed_note ); ?></div>
+			<?php
+		}
+		?>
 		<?php
 
 		return ob_get_clean();

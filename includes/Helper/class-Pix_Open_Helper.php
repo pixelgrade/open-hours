@@ -116,37 +116,37 @@ class Pix_Open_Helper {
 
 		switch ( $filter ) {
 			case 'time':
-				$response = date( $time_format );
+				$response = current_time( $time_format );
 				break;
 			case 'today':
-				$response = date('l', strtotime("Sunday + {$dw} days"));
+				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
 				break;
 			case 'next-day':
-				$dw = $dw+1;
-				$response = date('l', strtotime("Sunday + {$dw} days"));
+				$dw       = $dw + 1;
+				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
 				break;
 			case 'today-start-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				if ($today_interval) {
-					$response       = $this->_parse_hours( $today_interval[0]['start'], $time_format );
+				if ( $today_interval ) {
+					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format );
 				}
 				break;
 			case 'today-end-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
-				if ($today_interval) {
-					$response       = $this->_parse_hours( $today_interval[0]['end'], $time_format );
+				if ( $today_interval ) {
+					$response = $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				}
 				break;
 			case 'next-start-time':
 				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
-				if ($next_day_interval){
-					$response          = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
+				if ( $next_day_interval ) {
+					$response = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
 				}
 				break;
 			case 'next-end-time':
 				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
-				if ($next_day_interval) {
-					$response          = $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
+				if ( $next_day_interval ) {
+					$response = $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
 				}
 				break;
 			default:
@@ -154,6 +154,42 @@ class Pix_Open_Helper {
 		}
 
 		return $response;
+	}
+
+	public function is_open() {
+		$overview_option = get_option( 'open_hours_overview_setting' );
+		$parsed_option   = json_decode( $overview_option, true );
+
+		if ( isset( $atts['overview_option'] ) && ! empty( $atts['overview_option'] ) ) {
+			$overview_option = base64_decode( $atts['overview_option'] );
+		}
+
+		$today        = date( 'N' );
+		$current_time = current_time( 'Hi' );
+		$ct           = strtotime( preg_replace( '/^\+/', '', $current_time ) );
+
+		if ( ! isset( $parsed_option['timeframes'] ) ) {
+			//exit
+			return false;
+		}
+
+		foreach ( $parsed_option['timeframes'] as $timeframe ) {
+			$days          = $timeframe['days'];
+			$open_interval = $timeframe['open'];
+
+			if ( in_array( $today, $days ) ) {
+				if ( isset( $open_interval[0] ) ) {
+					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
+					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
+
+					if ( $ct >= $start && $ct <= $end ) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
