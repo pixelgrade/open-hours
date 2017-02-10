@@ -138,7 +138,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		} else {
 			$hide_closed_days = false;
 		}
-		var_dump( $instance );
+
 		$schedule = $helper->parse_open_hours( $open_hours, $instance['time_format'], $instance['closed_label'], $use_short_days, $compress_hours, $hide_closed_days );
 
 		$open_note  = $args['widget_id'] . '-openNote';
