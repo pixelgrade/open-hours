@@ -17,7 +17,7 @@
 					overview_option: jsonHours
 				},
 				success: function (e) {
-					console.log(e);
+//					console.log(e);
 					$('.preview_open_widget').html(e);
 				}
 			});

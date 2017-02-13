@@ -4,7 +4,7 @@
 		let open_widgets = open_hours.widget_ids;
 
 		for (var i = 0; i < open_widgets.length; i++) {
-			console.log(open_widgets[i]);
+//			console.log(open_widgets[i]);
 			api(create_open_customizer_id(open_widgets[i]), function (value) {
 				value.bind(function (message) {
 					// deserialize the decoded value
@@ -27,10 +27,10 @@
 					try {
 						var widgetValues = JSON.parse(expression);
 					} catch (e) {
-						console.log(e.message);
+//						console.log(e.message);
 					}
 
-					console.log(widgetValues);
+//					console.log(widgetValues);
 
 					// Change the closed label for our Schedule
 					if (widgetValues !== 'undefined' && widgetValues.closed_label !== 'undefined') {
@@ -60,7 +60,7 @@
 						widgetValues['closed_note'] = replace_tags(widgetValues['closed_note']);
 					}
 
-					console.log(widgetValues);
+//					console.log(widgetValues);
 					// Change the widget's content
 					var section_id = '#' + widgetValues['widget_id'];
 					var open_note_id = '#' + widgetValues['widget_id'] + '-openNote';
@@ -97,7 +97,7 @@
 						dataType: 'jsonp',
 						async: false,
 						success: function (json) {
-							console.log(json);
+//							console.log(json);
 
 						},
 						error: function (data) {;
