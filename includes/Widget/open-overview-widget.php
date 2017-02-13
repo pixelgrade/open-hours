@@ -81,14 +81,16 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		) );
 
 		$this->addField( 'closed_label', array(
-			'type'    => 'text',
+			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
-			'caption' => __( 'Closed Label', 'open_hours' )
+			'caption'   => __( 'Closed Label', 'open_hours' ),
+			'default'   => _( 'Closed' )
 		) );
 
 		$this->addField( 'time_format', array(
 			'type'    => 'text',
-			'caption' => __( 'Time Format', 'open_hours' )
+			'caption' => __( 'Time Format', 'open_hours' ),
+			'default' => _( 'g:i a' )
 		) );
 
 		$this->addField( 'time_format_foot', array(
@@ -114,19 +116,24 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'Helper/class-Pix_Open_Helper.php';
 		$helper = new Pix_Open_Helper();
 
-		if ( $instance['short_day_name'] == 1 ) {
+		// First time - set some defaults
+		if ( empty( $instance ) ) {
+			$instance = $this->update( $instance, array() );
+		}
+
+		if ( isset( $instance['short_day_name'] ) && $instance['short_day_name'] == 1 ) {
 			$use_short_days = true;
 		} else {
 			$use_short_days = false;
 		}
 
-		if ( $instance['compress_opening_hours'] == 1 ) {
+		if ( isset( $instance['compress_opening_hours'] ) && $instance['compress_opening_hours'] == 1 ) {
 			$compress_hours = true;
 		} else {
 			$compress_hours = false;
 		}
 
-		if ( $instance['hide_closed_days'] == 1 ) {
+		if ( isset( $instance['hide_closed_days'] ) && $instance['hide_closed_days'] == 1 ) {
 			$hide_closed_days = true;
 		} else {
 			$hide_closed_days = false;
@@ -193,10 +200,10 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$instance                           = array();
-		$instance['title']                  = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['title']                  = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : 'Opening Hours';
 		$instance['compress_opening_hours'] = ( ! empty( $new_instance['compress_opening_hours'] ) ) ? '1' : '0';
 		$instance['hide_closed_days']       = ( ! empty( $new_instance['hide_closed_days'] ) ) ? '1' : '0';
-		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : '';
+		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : 'Closed';
 		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : 'g:i a';
 		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']              = $this->getWidgetId();

@@ -138,6 +138,11 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		$open_note_id  = $args['widget_id'] . '-openNote';
 		$close_note_id = $args['widget_id'] . '-closeNote';
 
+		// First time - set some defaults
+		if ( empty( $instance ) ) {
+			$instance = $this->update( $instance, array() );
+		}
+
 		echo $args['before_widget'];
 		if ( ! empty( $instance['title'] ) ) {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
