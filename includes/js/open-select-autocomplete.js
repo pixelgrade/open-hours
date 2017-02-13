@@ -19,12 +19,12 @@
 		function extractLast( term ) {
 			return split( term ).pop();
 		}
-		console.log($('div[id*="_open_current_status_"]'));
+//		console.log($('div[id*="_open_current_status_"]'));
 
 
 		$( '.js-time-autocomplete' ).each( function (  ) {
 			// don't navigate away from the field on tab when selecting an item
-			console.log($(this));
+//			console.log($(this));
 			$( this ).on( "keydown", function( event ) {
 				if ( event.keyCode === $.ui.keyCode.TAB &&
 				     $( this ).autocomplete( "instance" ).menu.active ) {
