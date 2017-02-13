@@ -8,8 +8,8 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	 * Register widget with WordPress.
 	 */
 	function __construct() {
-		$title       = esc_html__( 'Open: Current Status A wonderful widget', 'text_domain' );
-		$description = esc_html__( 'A Foo Widget', 'text_domain' );
+		$title       = esc_html__( 'Open Hours: Current Status', 'open_hours' );
+		$description = esc_html__( 'Open Hours: Current Status', 'open_hours' );
 
 		parent::__construct( 'open_current_status_widget', $title, $description );
 
@@ -19,8 +19,8 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	function add_rest_routes_api() {
 		//The Following registers an api route with multiple parameters.
 		register_rest_route( 'open_hours/v1', '/get_time', array(
-			'methods'  => 'GET',
-			'callback' => array( $this, 'get_time' ),
+			'methods'             => 'GET',
+			'callback'            => array( $this, 'get_time' ),
 			'permission_callback' => array( $this, 'permission_nonce_callback' )
 		) );
 	}
@@ -63,12 +63,12 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		// Fields
 		$this->addField( 'title', array(
 			'type'    => 'text',
-			'caption' => __( 'Title', 'text_domain' )
+			'caption' => __( 'Title', 'open_hours' )
 		) );
 
 		$this->addField( 'title_foot', array(
 			'type'    => 'description',
-			'caption' => __( 'Title foot note', 'text_domain' ),
+			'caption' => __( 'Title foot note', 'open_hours' ),
 			'notes'   => array(
 				'header' => 'Write the "Open" and "Closed" messages using the tags displayed below.',
 				'footer' => _( 'See <a href="#" class="js-show-hours-scheme">available tags</a> scheme.' )
@@ -76,46 +76,46 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		) );
 
 		$this->addField( 'open_note', array(
-			'type'    => 'text',
+			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
-			'caption' => __( 'Open Note', 'text_domain' )
+			'caption'   => __( 'Open Note', 'open_hours' )
 		) );
 
 		$this->addField( 'open_note_foot', array(
-			'type'    => 'description',
-			'caption' => __( 'Open Note Foot Note', 'text_domain' ),
-			'notes'   => array(
+			'type'      => 'description',
+			'caption'   => __( 'Open Note Foot Note', 'open_hours' ),
+			'notes'     => array(
 				'header' => 'It\'s {time} and we\'re Open until {today-end-time}',
 				'footer' => '{time} - It\'s today, we\'re Open.'
 			),
-			'css_class'     => 'opening-hours-example'
+			'css_class' => 'opening-hours-example'
 		) );
 
 		$this->addField( 'closed_note', array(
-			'type'    => 'text',
+			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
-			'caption' => __( 'Closed Note', 'text_domain' )
+			'caption'   => __( 'Closed Note', 'open_hours' )
 		) );
 
 		$this->addField( 'closed_note_foot', array(
-			'type'    => 'description',
-			'caption' => __( 'Closed Note Footnote', 'text_domain' ),
-			'notes'   => array(
+			'type'      => 'description',
+			'caption'   => __( 'Closed Note Footnote', 'open_hours' ),
+			'notes'     => array(
 				'header' => 'We\'re closed until {next-day} at {next-time}',
 				'footer' => '{time} - it\'s closed now'
 			),
-			'css_class'     => 'opening-hours-example'
+			'css_class' => 'opening-hours-example'
 		) );
 
 
 		$this->addField( 'time_format', array(
 			'type'    => 'text',
-			'caption' => __( 'Time Format', 'text_domain' )
+			'caption' => __( 'Time Format', 'open_hours' )
 		) );
 
 		$this->addField( 'time_format_foot', array(
 			'type'    => 'description',
-			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
+			'caption' => __( 'TimeFormat Footnote', 'open_hours' ),
 			'notes'   => array(
 				'header' => _( '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">Learn more about time formatting</a>' ),
 				'footer' => ''
@@ -124,7 +124,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
 		$this->addField( 'use_short_day_name', array(
 			'type'    => 'checkbox',
-			'caption' => __( 'Use short day name', 'text_domain' )
+			'caption' => __( 'Use short day name', 'open_hours' )
 		) );
 	}
 
@@ -155,13 +155,13 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance                = array();
-		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? esc_attr( $new_instance['open_note'] ) : '';
-		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? esc_attr( $new_instance['closed_note'] ) : '';
-		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : 'g:i a';
-		$instance['use_short_day_name']         = ( ! empty( $new_instance['use_short_day_name'] ) ) ? '1' : '0';
-		$instance['widget_id']   = $this->getWidgetId();
+		$instance                       = array();
+		$instance['title']              = ( ! empty( $new_instance['title'] ) ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
+		$instance['open_note']          = ( ! empty( $new_instance['open_note'] ) ) ? wp_strip_all_tags( $new_instance['open_note'] ) : '';
+		$instance['closed_note']        = ( ! empty( $new_instance['closed_note'] ) ) ? wp_strip_all_tags( $new_instance['closed_note'] ) : '';
+		$instance['time_format']        = ( ! empty( $new_instance['time_format'] ) ) ? wp_strip_all_tags( $new_instance['time_format'] ) : 'g:i a';
+		$instance['use_short_day_name'] = ( ! empty( $new_instance['use_short_day_name'] ) ) ? '1' : '0';
+		$instance['widget_id']          = $this->getWidgetId();
 
 		return $instance;
 	}

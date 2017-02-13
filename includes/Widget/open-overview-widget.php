@@ -8,8 +8,8 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	 * Register widget with WordPress.
 	 */
 	function __construct() {
-		$title       = esc_html__( 'Opening Hours: Overview', 'text_domain' );
-		$description = esc_html__( 'A Foo Widget', 'text_domain' );
+		$title       = esc_html__( 'Open Hours: Overview', 'open_hours' );
+		$description = esc_html__( 'Opening Hours: Overview', 'open_hours' );
 
 		parent::__construct( 'open_overview_widget', $title, $description );
 
@@ -95,7 +95,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 
 		$this->addField( 'time_format_foot', array(
 			'type'    => 'description',
-			'caption' => __( 'TimeFormat Footnote', 'text_domain' ),
+			'caption' => __( 'TimeFormat Footnote', 'open_hours' ),
 			'notes'   => array(
 				'header' => _( '<a href="#" class="js-show-hours-scheme">Learn more about time formatting</a>' ),
 				'footer' => ''
@@ -200,11 +200,11 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$instance                           = array();
-		$instance['title']                  = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : 'Opening Hours';
+		$instance['title']                  = ( ! empty( $new_instance['title'] ) ) ? wp_strip_all_tags( $new_instance['title'] ) : 'Opening Hours';
 		$instance['compress_opening_hours'] = ( ! empty( $new_instance['compress_opening_hours'] ) ) ? '1' : '0';
 		$instance['hide_closed_days']       = ( ! empty( $new_instance['hide_closed_days'] ) ) ? '1' : '0';
-		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? strip_tags( $new_instance['closed_label'] ) : 'Closed';
-		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? strip_tags( $new_instance['time_format'] ) : 'g:i a';
+		$instance['closed_label']           = ( ! empty( $new_instance['closed_label'] ) ) ? wp_strip_all_tags( $new_instance['closed_label'] ) : 'Closed';
+		$instance['time_format']            = ( ! empty( $new_instance['time_format'] ) ) ? wp_strip_all_tags( $new_instance['time_format'] ) : 'g:i a';
 		$instance['short_day_name']         = ( ! empty( $new_instance['short_day_name'] ) ) ? '1' : '0';
 		$instance['widget_id']              = $this->getWidgetId();
 

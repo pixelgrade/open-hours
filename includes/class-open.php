@@ -115,7 +115,7 @@ class OpenPlugin {
 
 		// Add our section to the customizer
 		$wp_customize->add_section( 'open_hours_overview_section', array(
-			'title'    => __( '🕒 &nbsp;Opening Hours', 'open_hours' ),
+			'title'    => __( '🕒 &nbsp;Open Hours', 'open_hours' ),
 			'priority' => 9999,
 		) );
 
