@@ -9,7 +9,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 	 */
 	function __construct() {
 		$title       = esc_html__( 'Open Hours: Overview', 'open_hours' );
-		$description = esc_html__( 'Opening Hours: Overview', 'open_hours' );
+		$description = esc_html__( 'Open Hours: Overview', 'open_hours' );
 
 		parent::__construct( 'open_overview_widget', $title, $description );
 

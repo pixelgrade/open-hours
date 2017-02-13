@@ -1,4 +1,4 @@
-=== Open Hours - The Missing Grid Content Editor ===
+=== Open Hours -  Easy Opening Hours ===
 Contributors: pixelgrade, jumparound
 Tags: restaurant, bar, business hours, currently open, date, hours, opening hours, osteria, overview, shortcode, status, table, time, widget
 Requires at least: 4.6.1

@@ -21,6 +21,23 @@ gulp.task('styles', function () {
 });
 
 /**
+ * Create a zip archive out of the cleaned folder and delete the folder
+ */
+gulp.task( 'zip', ['build'], function() {
+	return gulp.src( './' )
+		.pipe( exec( 'cd ./../; rm -rf Open-Hours-1-0-0.zip; cd ./build/; zip -r -X ./../Open-Hours-1-0-0.zip ./open-hours; cd ./../; rm -rf build' ) );
+
+} );
+
+/**
+ * Copy theme folder outside in a build folder, recreate styles before that
+ */
+gulp.task( 'copy-folder', function() {
+	return gulp.src( './' )
+		.pipe( exec( 'rm -Rf ./../build; mkdir -p ./../build/open-hours; cp -Rf ./* ./../build/open-hours/' ) );
+} );
+
+/**
  * Clean the folder of unneeded files and folders
  */
 gulp.task( 'build', ['copy-folder'], function() {
@@ -59,7 +76,7 @@ gulp.task( 'build', ['copy-folder'], function() {
 	];
 
 	files_to_remove.forEach( function( e, k ) {
-		files_to_remove[k] = '../build/open/' + e;
+		files_to_remove[k] = '../build/open-hours/' + e;
 	} );
 
 	del.sync(files_to_remove, {force: true});

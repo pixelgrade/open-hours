@@ -21,7 +21,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			<div class="opening-hours-example">
 				Monday 10am - 3pm<br/>
 				Tuesday to Friday 9 - 17<br/>
-				Sat to Sun - 2am<br/>
+				Sat noon - 2am<br/>
 			</div>
 			<a href="#" class="js-show-hours-scheme">Learn more about</a> setting hours.
 		</div>
@@ -31,8 +31,8 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			<p>There are two ways to display: </p>
 			<ol class="opening-hours-list">
 				<li>
-                    <strong>Opening Hours Widget</strong>
-                    <p>Use the two "Opening Hours" widgets available to display an overview of the opening hours or the current status of your venuie (open or closed).</p>
+                    <strong>Open Hours Widgets</strong>
+                    <p>Use the two "Open Hours" widgets available to display an overview of the opening hours or the current status of your venue (open or closed).</p>
                 </li>
 				<li>
                     <strong>Shortcode</strong>
