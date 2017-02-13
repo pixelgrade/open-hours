@@ -50,7 +50,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			if ($opening_hours_option) {
 				echo do_shortcode( '[opening-hours-overview ' . 'overview_option=' . base64_encode($opening_hours_option) . ']' );
 			} else {
-				echo __('You have not setup a schedule yet.');
+				echo __('You have not setup a schedule yet.', 'open_hours');
 			}
 
 			?>

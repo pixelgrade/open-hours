@@ -67,9 +67,7 @@ class Pix_Open_Shortcodes {
 			</table>
 			<?php
 		} else {
-			?>
-			<p>You haven't setup a schedule yet.</p>
-			<?php
+			?><p><?php echo __('You haven\'t setup a schedule yet.', 'open_hours')?></p><?php
 		}
 
 		return ob_get_clean();

@@ -65,11 +65,11 @@ class OpenPlugin {
 	 * Enqueue control scripts
 	 */
 	public function enqueue_customizer_control_scripts() {
-		if ($this->is_customizer_control()) {
+		if ( $this->is_customizer_control() ) {
 			wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
-					'jquery',
-					'wp-util'
-				), $this->plugin_version, true );
+				'jquery',
+				'wp-util'
+			), $this->plugin_version, true );
 			wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
 		}
 

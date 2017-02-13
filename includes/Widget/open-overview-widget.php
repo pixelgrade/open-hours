@@ -180,9 +180,7 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 			</table>
 			<?php
 		} else {
-			?>
-			<p>You haven't setup a schedule yet.</p>
-			<?php
+			?><p><?php echo __('You haven\'t setup a schedule yet.', 'open_hours')?></p><?php
 		}
 		echo $args['after_widget'];
 	}
