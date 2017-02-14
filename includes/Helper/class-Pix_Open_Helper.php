@@ -141,17 +141,26 @@ class Pix_Open_Helper {
 				}
 				break;
 			case 'next-opening-day':
-				$next_open_day = $this->get_next_open_day( $schedule, $dw, $time_format );
-				$response      = date( 'l', strtotime( "Sunday + {$next_open_day} days" ) );
+				$next_open_day = $this->get_next_open_day( $dw );
+				$key           = array_keys( $next_open_day );
+				$response      = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
 				break;
 			case 'next-opening-time':
-				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, 'start' );
+				$next_open_day = $this->get_next_open_day( $dw );
+				$key           = array_keys( $next_open_day );
+				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['start'], $time_format) : '';
 				break;
 			case 'next-closing-time':
-				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, 'end' );
+				$next_open_day = $this->get_next_open_day( $dw );
+				$key           = array_keys( $next_open_day );
+				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['end'], $time_format) : '';
 				break;
 			case 'next-opening-timeframe':
-				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, null );
+				$next_open_day = $this->get_next_open_day( $dw );
+				$key           = array_keys( $next_open_day );
+				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['start'], $time_format) : '';
+				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['end'], $time_format) : '';
+				$response      = $start . ' - ' . $end;
 				break;
 			default:
 				break;
@@ -160,38 +169,41 @@ class Pix_Open_Helper {
 		return $response;
 	}
 
-	public function get_next_open_day( $schedule, $day, $time_format, $interval = null, $period = null ) {
-		$today_interval = $this->_get_interval( $schedule, $day );
+	public function get_next_open_day( $today ) {
+		$schedule = $this->_get_open_days();
+		$today    = (int) $today;
 
-		// If we do have an interval for today - check to see if it's been finshed and return the correct day when it will be open again.
-		if ( ! empty( $today_interval ) && ! $interval && ! $period ) {
-			// Get the current timestamp and compare it to the end time for today's interval. If it's bigger - then today's schedule has ended.
+		if ( array_key_exists( $today, $schedule ) ) {
 			$current_timestamp = current_time( 'timestamp' );
-			$today_end_time    = strtotime( preg_replace( '/^\+/', '', $today_interval[0]['end'] ) );
+			$today_start_time  = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['start'] ) );
+			$today_end_time    = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['end'] ) );
+
+			if ( $today_end_time < $today_start_time ) {
+				$today_end_time = strtotime( '+1 day', $today_end_time );
+			}
 
 			// If the current timestamp is bigger than the day's end time - increment the day.
 			if ( $current_timestamp > $today_end_time ) {
-				$dw  = $day + 1;
-				$day = date( 'N', strtotime( "Sunday + {$dw} days" ) );
-			}
 
-			return $day;
+				$index = array_search( $today, array_keys( $schedule ), true );
+				if ( $index !== false ) {
+					$slice = array_slice( $schedule, $index + 1, null, true );
+
+					foreach ( $slice as $key => $value ) {
+						$response[ $key ] = $value;
+
+						return $response;
+					}
+				}
+
+			} else {
+				$response[ $today ] = $schedule[ $today ];
+
+				return $response;
+			}
 		}
 
-		for ( $i = 0; $i < 7 * 24 * 3600; $i += 24 * 3600 ) {
-			$day               = date( "N", current_time( 'timestamp' ) + $i );
-			$next_day_interval = $this->_get_interval( $schedule, $day );
 
-			if ( ! empty( $next_day_interval ) && ! $interval && ! $period ) {
-				return $day;
-			} elseif ( ! empty( $next_day_interval ) && $interval && $period ) {
-				return $this->_parse_hours( $next_day_interval[0][ $period ], $time_format );
-			} elseif ( ! empty( $next_day_interval ) && $interval && ! $period ) {
-				return $this->_parse_hours( $next_day_interval[0]['start'], $time_format ) . ' - ' . $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
-			}
-		}
-
-		return false;
 	}
 
 	public function is_open() {
@@ -355,6 +367,32 @@ class Pix_Open_Helper {
 		$response[ $key ] = 'closed';
 
 		return $response;
+	}
+
+	/**
+	 * Helper function that creates an array of timeframes
+	 */
+	function _get_open_days() {
+		$overview_option = get_option( 'open_hours_overview_setting' );
+		$schedule        = array();
+
+		if ( ! $overview_option ) {
+			return false;
+		}
+
+		$parsed_option = json_decode( $overview_option, true );
+
+		if ( ! isset( $parsed_option['timeframes'] ) ) {
+			return false;
+		}
+
+		foreach ( $parsed_option['timeframes'] as $timeframe ) {
+			foreach ( $timeframe['days'] as $day ) {
+				$schedule[ $day ] = $timeframe['open'][0];
+			}
+		}
+
+		return $schedule;
 	}
 
 }
