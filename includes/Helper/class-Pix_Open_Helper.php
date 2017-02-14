@@ -231,7 +231,6 @@ class Pix_Open_Helper {
 				return $response;
 			}
 		}
-
 	}
 
 	public function is_open() {
@@ -265,7 +264,7 @@ class Pix_Open_Helper {
 					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
 					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
 
-					if ( $end < $start ) {
+					if ( $end <= $start ) {
 						$end = strtotime( '+1 day', $end );
 					}
 
@@ -417,9 +416,10 @@ class Pix_Open_Helper {
 		foreach ( $parsed_option['timeframes'] as $timeframe ) {
 			foreach ( $timeframe['days'] as $day ) {
 				$schedule[ $day ] = $timeframe['open'][0];
-
 			}
 		}
+
+		ksort( $schedule );
 
 		return $schedule;
 	}
