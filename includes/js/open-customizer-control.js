@@ -49,7 +49,7 @@
 		} )
 
 		// Hide the Open Hours Scheme
-		$( document ).on( 'click', '.open-scheme', function( event ) {
+		$( document ).on( 'click', '.opening-hours-timestamps-explained', function( event ) {
 			event.preventDefault();
 			event.stopPropagation();
 
