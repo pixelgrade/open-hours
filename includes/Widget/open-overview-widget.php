@@ -35,12 +35,12 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		}
 
 		if ( isset( $params['overview_option'] ) && ! empty( $params['overview_option'] ) ) {
-			$shortcode = do_shortcode( '[opening-hours-overview ' . 'overview_option=' . base64_encode( $params['overview_option'] ) . ']' );
+			$shortcode = do_shortcode( '[open-hours-overview ' . 'overview_option=' . base64_encode( $params['overview_option'] ) . ']' );
 		} elseif ( isset( $params['values'] ) ) {
 			$time_format  = $params['values']['time_format'];
 			$closed_label = $params['values']['closed_label'];
 
-			$shortcode = do_shortcode( '[opening-hours-overview ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
+			$shortcode = do_shortcode( '[open-hours-overview ' . 'time_format=' . '"' . $time_format . '"' . ' ' . 'closed_label=' . '"' . $closed_label . '"' . ']' );
 		}
 
 		wp_send_json( $shortcode );

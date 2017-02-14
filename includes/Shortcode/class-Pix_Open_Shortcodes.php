@@ -7,7 +7,7 @@ class Pix_Open_Shortcodes {
 	}
 
 	/**
-	 * ['opening-hours-overview'] shortcodes
+	 * [open-hours-overview] shortcodes
 	 */
 	function add_open_overview_shortcodes( $atts, $content = null ) {
 		$overview_option = get_option( 'open_hours_overview_setting' );
@@ -74,7 +74,7 @@ class Pix_Open_Shortcodes {
 	}
 
 	/**
-	 * ['open-time-shortcode'] shortcodes
+	 * [open-time-shortcode] shortcodes
 	 */
 	function add_open_time_shortcode( $atts ) {
 		$a = shortcode_atts(
@@ -96,7 +96,7 @@ class Pix_Open_Shortcodes {
 	}
 
 	/**
-	 * ['opening-hours-current-status'] shortcodes
+	 * ['open-hours-current-status'] shortcodes
 	 */
 	function add_current_status_shortcode( $atts ) {
 		$helper          = new Pix_Open_Helper();

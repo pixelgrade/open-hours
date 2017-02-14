@@ -55,9 +55,9 @@ class OpenPlugin {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
 		$shortcodes = new Pix_Open_Shortcodes();
 
-		add_shortcode( 'opening-hours-overview', array( $shortcodes, 'add_open_overview_shortcodes' ) );
+		add_shortcode( 'open-hours-overview', array( $shortcodes, 'add_open_overview_shortcodes' ) );
 		add_shortcode( 'open-time-shortcode', array( $shortcodes, 'add_open_time_shortcode' ) );
-		add_shortcode( 'opening-hours-current-status', array( $shortcodes, 'add_current_status_shortcode' ) );
+		add_shortcode( 'open-hours-current-status', array( $shortcodes, 'add_current_status_shortcode' ) );
 
 	}
 

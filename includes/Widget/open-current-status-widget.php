@@ -149,7 +149,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		}
 
 		// Display the open Note
-		echo do_shortcode( '[opening-hours-current-status ' . 'open_note_id=' . '"' . $open_note_id . '"' . ' close_note_id=' . '"' . $close_note_id . '"' . ' open_note=' . '"' . $instance['open_note'] . '"' . ' closed_note=' . '"' . $instance['closed_note'] . '"' . ' time_format=' . '"' . $instance['time_format'] . '"' . ']' );
+		echo do_shortcode( '[open-hours-current-status ' . 'open_note_id=' . '"' . $open_note_id . '"' . ' close_note_id=' . '"' . $close_note_id . '"' . ' open_note=' . '"' . $instance['open_note'] . '"' . ' closed_note=' . '"' . $instance['closed_note'] . '"' . ' time_format=' . '"' . $instance['time_format'] . '"' . ']' );
 
 		echo $args['after_widget'];
 	}

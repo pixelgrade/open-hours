@@ -37,8 +37,8 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 				<li>
                     <strong>Shortcode</strong>
                     <p>Use the shortcodes below in a page content:</p>
-                    <div class="opening-hours-example">[opening-hours-overview]</div>
-                    <div class="opening-hours-example">[opening-hours-current-status]</div>
+                    <div class="opening-hours-example">[open-hours-overview]</div>
+                    <div class="opening-hours-example">[open-hours-current-status]</div>
                 </li>
 			</ol>
 		</div>
@@ -48,7 +48,7 @@ class Pix_Open_Customize_Overview_Control extends Pix_Open_Customize_Control {
 			$opening_hours_option = get_option('open_hours_overview_setting');
 
 			if ($opening_hours_option) {
-				echo do_shortcode( '[opening-hours-overview ' . 'overview_option=' . base64_encode($opening_hours_option) . ']' );
+				echo do_shortcode( '[open-hours-overview ' . 'overview_option=' . base64_encode($opening_hours_option) . ']' );
 			} else {
 				echo __('You have not setup a schedule yet.', 'open_hours');
 			}

@@ -104,7 +104,8 @@ class Pix_Open_Helper {
 	 * Returns the time for a specific filter
 	 */
 	public function get_shortcode_time( $filter = null, $time_format = 'g:i A' ) {
-		$dw              = date( "N", time() );
+		$dw              = date( "N", current_time( 'timestamp' ) );
+		$next_day        = date( "N", current_time( 'timestamp' ) + 24 * 3600 );
 		$overview_option = get_option( 'open_hours_overview_setting' );
 
 		if ( ! $overview_option ) {
@@ -112,7 +113,7 @@ class Pix_Open_Helper {
 		}
 
 		$schedule = json_decode( $overview_option, true );
-		$response = 'closed';
+		$response = '';
 
 		switch ( $filter ) {
 			case 'time':
@@ -121,33 +122,36 @@ class Pix_Open_Helper {
 			case 'today':
 				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
 				break;
-			case 'next-day':
-				$dw       = $dw + 1;
-				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
-				break;
-			case 'today-start-time':
+			case 'today-opening-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
 				if ( $today_interval ) {
 					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format );
 				}
 				break;
-			case 'today-end-time':
+			case 'today-closing-time':
 				$today_interval = $this->_get_interval( $schedule, $dw );
 				if ( $today_interval ) {
 					$response = $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				}
 				break;
-			case 'next-start-time':
-				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
-				if ( $next_day_interval ) {
-					$response = $this->_parse_hours( $next_day_interval[0]['start'], $time_format );
+			case 'today-timeframe':
+				$today_interval = $this->_get_interval( $schedule, $dw );
+				if ( $today_interval ) {
+					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format ) . ' - ' . $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				}
 				break;
-			case 'next-end-time':
-				$next_day_interval = $this->_get_interval( $schedule, $dw + 1 );
-				if ( $next_day_interval ) {
-					$response = $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
-				}
+			case 'next-opening-day':
+				$next_open_day = $this->get_next_open_day( $schedule, $dw, $time_format );
+				$response      = date( 'l', strtotime( "Sunday + {$next_open_day} days" ) );
+				break;
+			case 'next-opening-time':
+				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, 'start' );
+				break;
+			case 'next-closing-time':
+				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, 'end' );
+				break;
+			case 'next-opening-timeframe':
+				$response = $this->get_next_open_day( $schedule, $dw, $time_format, true, null );
 				break;
 			default:
 				break;
@@ -156,17 +160,56 @@ class Pix_Open_Helper {
 		return $response;
 	}
 
-	public function is_open() {
-		$overview_option = get_option( 'open_hours_overview_setting' );
-		$parsed_option   = json_decode( $overview_option, true );
+	public function get_next_open_day( $schedule, $day, $time_format, $interval = null, $period = null ) {
+		$today_interval = $this->_get_interval( $schedule, $day );
 
-		if ( isset( $atts['overview_option'] ) && ! empty( $atts['overview_option'] ) ) {
-			$overview_option = base64_decode( $atts['overview_option'] );
+		// If we do have an interval for today - check to see if it's been finshed and return the correct day when it will be open again.
+		if ( ! empty( $today_interval ) && ! $interval && ! $period ) {
+			// Get the current timestamp and compare it to the end time for today's interval. If it's bigger - then today's schedule has ended.
+			$current_timestamp = current_time( 'timestamp' );
+			$today_end_time    = strtotime( preg_replace( '/^\+/', '', $today_interval[0]['end'] ) );
+
+			// If the current timestamp is bigger than the day's end time - increment the day.
+			if ( $current_timestamp > $today_end_time ) {
+				$dw  = $day + 1;
+				$day = date( 'N', strtotime( "Sunday + {$dw} days" ) );
+			}
+
+			return $day;
 		}
 
-		$today        = date( 'N' );
-		$current_time = current_time( 'Hi' );
-		$ct           = strtotime( preg_replace( '/^\+/', '', $current_time ) );
+		for ( $i = 0; $i < 7 * 24 * 3600; $i += 24 * 3600 ) {
+			$day               = date( "N", current_time( 'timestamp' ) + $i );
+			$next_day_interval = $this->_get_interval( $schedule, $day );
+
+			if ( ! empty( $next_day_interval ) && ! $interval && ! $period ) {
+				return $day;
+			} elseif ( ! empty( $next_day_interval ) && $interval && $period ) {
+				return $this->_parse_hours( $next_day_interval[0][ $period ], $time_format );
+			} elseif ( ! empty( $next_day_interval ) && $interval && ! $period ) {
+				return $this->_parse_hours( $next_day_interval[0]['start'], $time_format ) . ' - ' . $this->_parse_hours( $next_day_interval[0]['end'], $time_format );
+			}
+		}
+
+		return false;
+	}
+
+	public function is_open() {
+		$overview_option = get_option( 'open_hours_overview_setting' );
+
+		if ( ! $overview_option ) {
+			return false;
+		}
+
+		$parsed_option = json_decode( $overview_option, true );
+
+		if ( ! isset( $parsed_option['timeframes'] ) ) {
+			return false;
+		}
+
+		$today     = date( 'N', current_time( 'timestamp' ) );
+		$yesterday = date( 'N', current_time( 'timestamp' ) - 24 * 3600 );
+		$ct        = current_time( 'timestamp' );
 
 		if ( ! isset( $parsed_option['timeframes'] ) ) {
 			//exit
@@ -182,7 +225,29 @@ class Pix_Open_Helper {
 					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
 					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
 
-					if ( $ct >= $start && $ct <= $end ) {
+					if ( $end < $start ) {
+						$end = strtotime( '+1 day', $end );
+					}
+
+					if ( ( $ct >= $start && $ct <= $end ) ) {
+						// It's open
+						return true;
+					}
+				}
+			}
+
+			// Check for prev day
+			if ( in_array( $yesterday, $days ) ) {
+				if ( isset( $open_interval[0] ) ) {
+					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
+					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
+
+					if ( $end < $start ) {
+						$end = strtotime( '+1 day', $end );
+					}
+
+					if ( ( $ct >= $start && $ct <= $end ) ) {
+						// It's open
 						return true;
 					}
 				}
@@ -209,7 +274,7 @@ class Pix_Open_Helper {
 		$interval = array();
 
 		foreach ( $schedule['timeframes'] as $timeframe ) {
-			if ( array_key_exists( $day, $timeframe['days'] ) ) {
+			if ( in_array( $day, $timeframe['days'] ) ) {
 				$interval = $timeframe['open'];
 			}
 		}
