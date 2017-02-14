@@ -143,23 +143,24 @@ class Pix_Open_Helper {
 			case 'next-opening-day':
 				$next_open_day = $this->get_next_open_day( $dw );
 				$key           = array_keys( $next_open_day );
-				$response      = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
+
+				$response = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
 				break;
 			case 'next-opening-time':
 				$next_open_day = $this->get_next_open_day( $dw );
 				$key           = array_keys( $next_open_day );
-				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['start'], $time_format) : '';
+				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
 				break;
 			case 'next-closing-time':
 				$next_open_day = $this->get_next_open_day( $dw );
 				$key           = array_keys( $next_open_day );
-				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['end'], $time_format) : '';
+				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
 				break;
 			case 'next-opening-timeframe':
 				$next_open_day = $this->get_next_open_day( $dw );
 				$key           = array_keys( $next_open_day );
-				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['start'], $time_format) : '';
-				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours($next_open_day[ $key[0] ]['end'], $time_format) : '';
+				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
+				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
 				$response      = $start . ' - ' . $end;
 				break;
 			default:
@@ -169,6 +170,13 @@ class Pix_Open_Helper {
 		return $response;
 	}
 
+	/**
+	 * @param $today
+	 *
+	 * @return mixed
+	 * This should return the next open day.
+	 * @TODO Refactor
+	 */
 	public function get_next_open_day( $today ) {
 		$schedule = $this->_get_open_days();
 		$today    = (int) $today;
@@ -186,10 +194,25 @@ class Pix_Open_Helper {
 			if ( $current_timestamp > $today_end_time ) {
 
 				$index = array_search( $today, array_keys( $schedule ), true );
-				if ( $index !== false ) {
+
+				if ( $index ) {
 					$slice = array_slice( $schedule, $index + 1, null, true );
 
+					if ( empty( $slice ) ) {
+						foreach ( $schedule as $key => $value ) {
+							$response[ $key ] = $value;
+
+							return $response;
+						}
+					}
+
 					foreach ( $slice as $key => $value ) {
+						$response[ $key ] = $value;
+
+						return $response;
+					}
+				} else {
+					foreach ( $schedule as $key => $value ) {
 						$response[ $key ] = $value;
 
 						return $response;
@@ -201,8 +224,13 @@ class Pix_Open_Helper {
 
 				return $response;
 			}
-		}
+		} else {
+			foreach ( $schedule as $key => $value ) {
+				$response[ $key ] = $value;
 
+				return $response;
+			}
+		}
 
 	}
 
@@ -389,6 +417,7 @@ class Pix_Open_Helper {
 		foreach ( $parsed_option['timeframes'] as $timeframe ) {
 			foreach ( $timeframe['days'] as $day ) {
 				$schedule[ $day ] = $timeframe['open'][0];
+
 			}
 		}
 
