@@ -143,8 +143,7 @@ class Pix_Open_Helper {
 			case 'next-opening-day':
 				$next_open_day = $this->get_next_open_day( $dw );
 				$key           = array_keys( $next_open_day );
-
-				$response = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
+				$response      = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
 				break;
 			case 'next-opening-time':
 				$next_open_day = $this->get_next_open_day( $dw );

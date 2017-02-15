@@ -80,6 +80,7 @@ class OpenPlugin {
 		// Load only if we are on the widgets page or in the customizer
 		wp_enqueue_script( 'open-select-autocomplete', plugin_dir_url( __FILE__ ) . 'js/open-select-autocomplete.js' );
 
+		setlocale(LC_ALL, get_locale());
 		$this->localize_control_js_data();
 	}
 
