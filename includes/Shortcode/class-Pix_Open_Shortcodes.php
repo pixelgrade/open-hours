@@ -47,22 +47,26 @@ class Pix_Open_Shortcodes {
 				foreach ( $schedule as $day => $hours ) {
 				?>
 				<tr>
-					<td><div class="open-entry">
-						<div class="open-entry__day"><?php echo $day; ?></div>
-					<?php
-					if ( $hours === $a['closed_label'] ) {
-						?>
+					<td>
+						<div class="open-entry">
+							<div class="open-entry__day"><?php echo $day; ?></div>
+					</td>
+					<td>
+						<?php
+						if ( $hours === $a['closed_label'] ) {
+							?>
 							<div class="open-entry__hours-closed"
 							     id=<?php echo '-hours-'; ?>><?php echo $hours; ?></div>
-						<?php
-					} else {
-						?>
+							<?php
+						} else {
+							?>
 							<div class="open-entry__hours-schedule" id=<?php echo 'sdsa'; ?>><?php echo $hours; ?></div>
-						<?php
-					}
-					}
-					?>
-                    </div></td>
+							<?php
+						}
+						}
+						?>
+					</td>
+					</div>
 				</tr>
 			</table>
 			<?php
