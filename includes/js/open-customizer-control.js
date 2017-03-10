@@ -1,5 +1,10 @@
 (function ($, api) {
 	api.bind('ready', function () {
+		if ($('#open_hours_overview-dummy').length == 0) {
+			var schedule = "Monday 10am - 3pm\nTuesday to Friday 9 - 17\nSat noon - 2am";
+			$('#open_hours_overview-dummy').append(schedule);
+		}
+
 		$('#open_hours_overview-dummy').on('keyup', function(e) {
 			e.preventDefault();
 			var currentValue = $(this).val();
