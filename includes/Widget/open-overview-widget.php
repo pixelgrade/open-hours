@@ -185,6 +185,9 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		echo $args['after_widget'];
 	}
 
+	public static function registerWidget() {
+		register_widget( 'OpenOverview_Widget' );
+	}
 
 	/**
 	 * Sanitize widget form values as they are saved.
