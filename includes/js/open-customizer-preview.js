@@ -30,7 +30,6 @@
 //						console.log(e.message);
 					}
 
-//					console.log(widgetValues);
 
 					// Change the closed label for our Schedule
 					if (widgetValues !== 'undefined' && widgetValues.closed_label !== 'undefined') {
