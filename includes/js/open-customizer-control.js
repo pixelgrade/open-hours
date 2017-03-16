@@ -8,9 +8,25 @@
 		$('#open_hours_overview-dummy').on('keyup', function(e) {
 			e.preventDefault();
 			var currentValue = $(this).val();
+			currentValue = removeClosedDays(currentValue);
+
 			var hours = fourSq.util.HoursParser.parse(currentValue);
 			var jsonHours = JSON.stringify(hours);
 
+			// Remove the days in which the business is closed. The parser doesn't need those days anyways.
+			function removeClosedDays( schedule ) {
+				var hoursString ='';
+				var lines = schedule.split('\n');
+				for (var i=0; i< lines.length; i++) {
+					if (lines[i].includes('closed') || lines[i].includes('Closed') || !lines[i].match(/\d+/g)) {
+						// don't add it to the list
+					} else {
+						hoursString += lines[i] + '\n';
+					}
+				}
+
+				return hoursString;
+			}
 			// Handle Preview
 			$.get({
 				url: open_hours_control.wp_rest.root + 'open_hours/v1/get_schedule_content',
@@ -22,7 +38,6 @@
 					overview_option: jsonHours
 				},
 				success: function (e) {
-//					console.log(e);
 					$('.preview_open_widget').html(e);
 				}
 			});
