@@ -180,7 +180,7 @@ class Pix_Open_Helper {
 		$schedule = $this->_get_open_days();
 		$today    = (int) $today;
 
-		if ( array_key_exists( $today, $schedule ) ) {
+		if ( is_array( $schedule ) && array_key_exists( $today, $schedule ) ) {
 			$current_timestamp = current_time( 'timestamp' );
 			$today_start_time  = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['start'] ) );
 			$today_end_time    = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['end'] ) );
@@ -223,12 +223,14 @@ class Pix_Open_Helper {
 
 				return $response;
 			}
-		} else {
+		} elseif ( is_array( $schedule ) ) {
 			foreach ( $schedule as $key => $value ) {
 				$response[ $key ] = $value;
 
 				return $response;
 			}
+		} else {
+			return array();
 		}
 	}
 

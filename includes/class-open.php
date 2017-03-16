@@ -31,10 +31,10 @@ class OpenPlugin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
+	public function __construct( $file, $version ) {
 
 		$this->plugin_name = 'open';
-		$this->version     = '1.0.0';
+		$this->version     = $version;
 
 		$this->define_hooks();
 	}
@@ -121,7 +121,7 @@ class OpenPlugin {
 		) );
 
 		$wp_customize->add_setting( 'open_hours_overview_setting', array(
-			'transport' => 'refresh',
+			'transport' => 'postMessage',
 			'type'      => 'option'
 		) );
 
