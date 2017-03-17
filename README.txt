@@ -23,6 +23,9 @@ Made with love by Pixelgrade!
 
 == Changelog ==
 
+= 1.0.2 =
+* hotfix for setting closed days
+
 = 1.0.1 =
 * fixed php 5.2 compatibility issues
 * added default schedule example
