@@ -2,7 +2,7 @@
 
 /**
  * @package Open Hours
- * @version 1.1
+ * @version 1.0.2
  */
 
 /*
@@ -10,7 +10,7 @@ Plugin Name: Open Hours
 Plugin URI: https://pixelgrade.com
 Description: An easy to use opening hours WordPress plugin manager for any kind of venue.
 Author: pixelgrade
-Version: 1.0.1
+Version: 1.0.2
 Author URI: https://pixelgrade.com
 */
 
