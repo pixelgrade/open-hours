@@ -3,7 +3,7 @@ Contributors: pixelgrade, jumparound
 Tags: restaurant, bar, business hours, currently open, date, hours, opening hours, osteria, overview, shortcode, status, table, time, widget
 Requires at least: 4.6.1
 Tested up to: 4.7.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,10 @@ Made with love by Pixelgrade!
 3. Start adding either your business' schedule or the current status of your operations through our Widgets or Shortcodes
 
 == Changelog ==
+
+= 1.0.3 =
+* Added fix for inconsistent current status
+* Changed labels for the Current Status Widget to match the correct replacement tags
 
 = 1.0.2 =
 * hotfix for setting closed days
