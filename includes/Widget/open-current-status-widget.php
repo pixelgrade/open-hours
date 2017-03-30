@@ -78,33 +78,36 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		$this->addField( 'open_note', array(
 			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
-			'caption'   => __( 'Open Note', 'open_hours' )
+			'caption'   => __( 'Open Note', 'open_hours' ),
+			'default'   => 'It\'s {time} and we\'re Open until {today-closing-time}'
 		) );
 
 		$this->addField( 'open_note_foot', array(
 			'type'      => 'description',
 			'caption'   => __( 'Open Note Foot Note', 'open_hours' ),
 			'notes'     => array(
-				'header' => 'It\'s {time} and we\'re Open until {today-end-time}',
+				'header' => 'It\'s {time} and we\'re Open until {today-closing-time}',
 				'footer' => '{time} - It\'s today, we\'re Open.'
 			),
-			'css_class' => 'opening-hours-example'
+			'css_class' => 'opening-hours-example',
+
 		) );
 
 		$this->addField( 'closed_note', array(
 			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
-			'caption'   => __( 'Closed Note', 'open_hours' )
+			'caption'   => __( 'Closed Note', 'open_hours' ),
+			'default'   => 'We\'re closed until {next-opening-day} at {next-opening-time}'
 		) );
 
 		$this->addField( 'closed_note_foot', array(
 			'type'      => 'description',
 			'caption'   => __( 'Closed Note Footnote', 'open_hours' ),
 			'notes'     => array(
-				'header' => 'We\'re closed until {next-day} at {next-time}',
+				'header' => 'We\'re closed until {next-opening-day} at {next-opening-time}',
 				'footer' => '{time} - it\'s closed now'
 			),
-			'css_class' => 'opening-hours-example'
+			'css_class' => 'opening-hours-example',
 		) );
 
 
@@ -154,12 +157,12 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	}
 
 	public function update( $new_instance, $old_instance ) {
-		$instance                       = array();
-		$instance['title']              = ( ! empty( $new_instance['title'] ) ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
-		$instance['open_note']          = ( ! empty( $new_instance['open_note'] ) ) ? wp_strip_all_tags( $new_instance['open_note'] ) : '';
-		$instance['closed_note']        = ( ! empty( $new_instance['closed_note'] ) ) ? wp_strip_all_tags( $new_instance['closed_note'] ) : '';
-		$instance['time_format']        = ( ! empty( $new_instance['time_format'] ) ) ? wp_strip_all_tags( $new_instance['time_format'] ) : 'g:i a';
-		$instance['widget_id']          = $this->getWidgetId();
+		$instance                = array();
+		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
+		$instance['open_note']   = ( ! empty( $new_instance['open_note'] ) ) ? wp_strip_all_tags( $new_instance['open_note'] ) : 'It\'s {time} and we\'re Open until {today-closing-time}';
+		$instance['closed_note'] = ( ! empty( $new_instance['closed_note'] ) ) ? wp_strip_all_tags( $new_instance['closed_note'] ) : 'We\'re closed until {next-opening-day} at {next-opening-time}';
+		$instance['time_format'] = ( ! empty( $new_instance['time_format'] ) ) ? wp_strip_all_tags( $new_instance['time_format'] ) : 'g:i a';
+		$instance['widget_id']   = $this->getWidgetId();
 
 		return $instance;
 	}

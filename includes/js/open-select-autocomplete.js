@@ -3,14 +3,13 @@
 		var timeTags = [
 				{ value: "{time}" },
 				{ value: "{today}" },
-				{ value: "{current-day}" },
-				{ value: "{today-time}" },
-				{ value: "{today-start-time}" },
-				{ value: "{today-end-time}" },
-				{ value: "{next-day}" },
-				{ value: "{next-time}" },
-				{ value: "{next-start-time}" },
-				{ value: "{next-end-time}" }
+				{ value: "{today-timeframe}" },
+				{ value: "{today-opening-time}" },
+				{ value: "{today-closing-time}" },
+				{ value: "{next-opening-day}" },
+				{ value: "{next-opening-timeframe}" },
+				{ value: "{next-opening-time}" },
+				{ value: "{next-closing-time}" }
 		];
 
 		function split( val ) {
