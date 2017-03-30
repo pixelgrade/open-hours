@@ -2,6 +2,8 @@
 
 class Pix_Open_Helper {
 
+	private $current_day;
+
 	/**
 	 * A helper function that takes in a raw JSON of timeframes and returns an array of human readable schedule
 	 */
@@ -105,6 +107,10 @@ class Pix_Open_Helper {
 	 */
 	public function get_shortcode_time( $filter = null, $time_format = 'g:i A' ) {
 		$dw              = date( "N", current_time( 'timestamp' ) );
+
+		// call the is_open function
+		$this->is_open();
+
 		$next_day        = date( "N", current_time( 'timestamp' ) + 24 * 3600 );
 		$overview_option = get_option( 'open_hours_overview_setting' );
 
@@ -123,19 +129,19 @@ class Pix_Open_Helper {
 				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
 				break;
 			case 'today-opening-time':
-				$today_interval = $this->_get_interval( $schedule, $dw );
+				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
 					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format );
 				}
 				break;
 			case 'today-closing-time':
-				$today_interval = $this->_get_interval( $schedule, $dw );
+				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
 					$response = $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				}
 				break;
 			case 'today-timeframe':
-				$today_interval = $this->_get_interval( $schedule, $dw );
+				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
 					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format ) . ' - ' . $this->_parse_hours( $today_interval[0]['end'], $time_format );
 				}
@@ -247,23 +253,29 @@ class Pix_Open_Helper {
 			return false;
 		}
 
-		$today     = date( 'N', current_time( 'timestamp' ) );
-		$yesterday = date( 'N', current_time( 'timestamp' ) - 24 * 3600 );
-		$ct        = current_time( 'timestamp' );
+		$today             = date( 'N', current_time( 'timestamp' ) );
+		$yesterday         = date( 'N', current_time( 'timestamp' ) - 24 * 3600 );
+		$ct                = current_time( 'timestamp' );
+
+		$month = date( 'F', current_time( 'timestamp' ) );
+		$year  = date( 'Y', current_time( 'timestamp' ) );
+
+		$today_full     = date( 'j', current_time( 'timestamp' ) ) . ' ' . $month . ' ' . $year;
+		$yesterday_full = date( 'j', current_time( 'timestamp' ) - 24 * 3600 ) . ' ' . $month . ' ' . $year;
 
 		if ( ! isset( $parsed_option['timeframes'] ) ) {
 			//exit
 			return false;
 		}
-
+		$this->current_day = $today;
 		foreach ( $parsed_option['timeframes'] as $timeframe ) {
 			$days          = $timeframe['days'];
 			$open_interval = $timeframe['open'];
 
 			if ( in_array( $today, $days ) ) {
 				if ( isset( $open_interval[0] ) ) {
-					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
-					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
+					$start = strtotime( $today_full . ' ' . preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
+					$end   = strtotime( $today_full . ' ' . preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
 
 					if ( $end <= $start ) {
 						$end = strtotime( '+1 day', $end );
@@ -279,14 +291,15 @@ class Pix_Open_Helper {
 			// Check for prev day
 			if ( in_array( $yesterday, $days ) ) {
 				if ( isset( $open_interval[0] ) ) {
-					$start = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
-					$end   = strtotime( preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
+					$start = strtotime( $yesterday_full . ' ' . preg_replace( '/^\+/', '', $open_interval[0]['start'] ) );
+					$end   = strtotime( $yesterday_full . ' ' . preg_replace( '/^\+/', '', $open_interval[0]['end'] ) );
 
 					if ( $end < $start ) {
 						$end = strtotime( '+1 day', $end );
 					}
 
 					if ( ( $ct >= $start && $ct <= $end ) ) {
+						$this->current_day = $yesterday;
 						// It's open
 						return true;
 					}
@@ -424,5 +437,4 @@ class Pix_Open_Helper {
 
 		return $schedule;
 	}
-
 }
