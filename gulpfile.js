@@ -73,6 +73,7 @@ gulp.task( 'build', ['copy-folder'], function() {
 		'admin/scss',
 		'admin/js/*.map',
 		'admin/css/*.map',
+		'.labels'
 	];
 
 	files_to_remove.forEach( function( e, k ) {
