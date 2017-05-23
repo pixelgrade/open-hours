@@ -106,7 +106,7 @@ class Pix_Open_Helper {
 	 * Returns the time for a specific filter
 	 */
 	public function get_shortcode_time( $filter = null, $time_format = 'g:i A' ) {
-		$dw              = date( "N", current_time( 'timestamp' ) );
+		$dw = date( "N", current_time( 'timestamp' ) );
 
 		// call the is_open function
 		$this->is_open();
@@ -147,22 +147,26 @@ class Pix_Open_Helper {
 				}
 				break;
 			case 'next-opening-day':
-				$next_open_day = $this->get_next_open_day( $dw );
+				$today         = $this->get_current_day( $dw );
+				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
 				$response      = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
 				break;
 			case 'next-opening-time':
-				$next_open_day = $this->get_next_open_day( $dw );
+				$today         = $this->get_current_day( $dw );
+				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
 				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
 				break;
 			case 'next-closing-time':
-				$next_open_day = $this->get_next_open_day( $dw );
+				$today         = $this->get_current_day( $dw );
+				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
 				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
 				break;
 			case 'next-opening-timeframe':
-				$next_open_day = $this->get_next_open_day( $dw );
+				$today         = $this->get_current_day( $dw );
+				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
 				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
 				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
@@ -173,71 +177,6 @@ class Pix_Open_Helper {
 		}
 
 		return $response;
-	}
-
-	/**
-	 * @param $today
-	 *
-	 * @return mixed
-	 * This should return the next open day.
-	 * @TODO Refactor
-	 */
-	public function get_next_open_day( $today ) {
-		$schedule = $this->_get_open_days();
-		$today    = (int) $today;
-
-		if ( is_array( $schedule ) && array_key_exists( $today, $schedule ) ) {
-			$current_timestamp = current_time( 'timestamp' );
-			$today_start_time  = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['start'] ) );
-			$today_end_time    = strtotime( preg_replace( '/^\+/', '', $schedule[ $today ]['end'] ) );
-
-			if ( $today_end_time < $today_start_time ) {
-				$today_end_time = strtotime( '+1 day', $today_end_time );
-			}
-
-			// If the current timestamp is bigger than the day's end time - increment the day.
-			if ( $current_timestamp > $today_end_time ) {
-
-				$index = array_search( $today, array_keys( $schedule ), true );
-
-				if ( $index ) {
-					$slice = array_slice( $schedule, $index + 1, null, true );
-
-					if ( empty( $slice ) ) {
-						foreach ( $schedule as $key => $value ) {
-							$response[ $key ] = $value;
-
-							return $response;
-						}
-					}
-
-					foreach ( $slice as $key => $value ) {
-						$response[ $key ] = $value;
-
-						return $response;
-					}
-				} else {
-					foreach ( $schedule as $key => $value ) {
-						$response[ $key ] = $value;
-
-						return $response;
-					}
-				}
-
-			} else {
-				$response[ $today ] = $schedule[ $today ];
-
-				return $response;
-			}
-		} elseif ( is_array( $schedule ) ) {
-			foreach ( $schedule as $key => $value ) {
-				$response[ $key ] = $value;
-
-				return $response;
-			}
-		} else {
-			return array();
-		}
 	}
 
 	public function is_open() {
@@ -253,9 +192,9 @@ class Pix_Open_Helper {
 			return false;
 		}
 
-		$today             = date( 'N', current_time( 'timestamp' ) );
-		$yesterday         = date( 'N', current_time( 'timestamp' ) - 24 * 3600 );
-		$ct                = current_time( 'timestamp' );
+		$today     = date( 'N', current_time( 'timestamp' ) );
+		$yesterday = date( 'N', current_time( 'timestamp' ) - 24 * 3600 );
+		$ct        = current_time( 'timestamp' );
 
 		$month = date( 'F', current_time( 'timestamp' ) );
 		$year  = date( 'Y', current_time( 'timestamp' ) );
@@ -300,6 +239,7 @@ class Pix_Open_Helper {
 
 					if ( ( $ct >= $start && $ct <= $end ) ) {
 						$this->current_day = $yesterday;
+
 						// It's open
 						return true;
 					}
@@ -436,5 +376,95 @@ class Pix_Open_Helper {
 		ksort( $schedule );
 
 		return $schedule;
+	}
+
+	/**
+	 * Convert the json of timeframes to a smarter array
+	 */
+	function _get_schedule_array() {
+		$option         = get_option( 'open_hours_overview_setting' );
+		$schedule_array = array();
+
+		// if no option was found - return false
+		if ( ! $option ) {
+			return false;
+		}
+
+		$option = json_decode( $option, true );
+
+		foreach ( $option['timeframes'] as $timeframe ) {
+			// Parse through the days and add them to our schedule_array
+			foreach ( $timeframe['days'] as $day ) {
+				$schedule_array[ $day ] = array(
+					'start' => $timeframe['open'][0]['start'],
+					'end'   => $timeframe['open'][0]['end']
+				);
+			}
+		}
+
+		// SOrt the array keys - so they're always be in order
+		ksort( $schedule_array, SORT_ASC );
+
+		return $schedule_array;
+	}
+
+	/**
+	 * @param $today
+	 *
+	 * @return bool|mixed
+	 * Gets the next open day
+	 */
+	public function get_next_open_day( $today ) {
+		$today    = (int) $today;
+		$schedule = $this->_get_schedule_array();
+
+		if ( $today === 7 ) {
+			$next_day = 1;
+		} else {
+			$next_day = $today + 1;
+		}
+
+		if ( ! isset( $schedule[ $next_day ] ) ) {
+			return $this->get_next_open_day( $next_day );
+		}
+
+		$next_open_day = array( $next_day => $schedule[ $next_day ] );
+
+		return $next_open_day;
+	}
+
+	/**
+	 * A function that returns the current day - in the context of today's schedule
+	 * If the current time is between today's start and end time - it will return the current day
+	 * If the current time is before today's start time - it will return yesterday
+	 */
+
+	public function get_current_day($today) {
+		$now         = current_time( 'timestamp' );
+		$current_day = date('l', $now);
+		$schedule = $this->_get_schedule_array();
+		$today = (int) $today;
+
+		if ( ! isset( $schedule[ $today ] ) ) {
+			// dunno what to do here
+			return $today;
+		}
+
+		$today_start = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . $schedule[ $today ]['start'] ) );
+		$today_end_time = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . $schedule[ $today ]['end'] ) );
+
+		if ( $now > $today_end_time ) {
+			return $today;
+		}
+
+		if ( $now < $today_start ) {
+			$today = $today - 1;
+		}
+
+		if ( $today === 0 ) {
+			$today = 7;
+		}
+
+		return $today;
 	}
 }
