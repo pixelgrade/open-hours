@@ -1,6 +1,11 @@
 <?php
 
-require_once( plugin_dir_path( __FILE__ ) . 'abstract-widget.php' );
+// Make sure the base widget class is loaded
+if ( ! class_exists( 'OpenAbstract_Widget' ) ) {
+	require_once( 'abstract-widget.php' );
+}
+
+if ( ! class_exists( 'OpenOverview_Widget' ) ) :
 
 class OpenOverview_Widget extends OpenAbstract_Widget {
 
@@ -84,20 +89,20 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 			'type'      => 'text',
 			'css_class' => 'js-time-autocomplete',
 			'caption'   => __( 'Closed Label', 'open_hours' ),
-			'default'   => _( 'Closed' )
+			'default'   => __( 'Closed' )
 		) );
 
 		$this->addField( 'time_format', array(
 			'type'    => 'text',
 			'caption' => __( 'Time Format', 'open_hours' ),
-			'default' => _( 'g:i a' )
+			'default' => __( 'g:i a' )
 		) );
 
 		$this->addField( 'time_format_foot', array(
 			'type'    => 'description',
 			'caption' => __( 'TimeFormat Footnote', 'open_hours' ),
 			'notes'   => array(
-				'header' => _( '<a href="#" class="js-show-hours-scheme">Learn more about time formatting</a>' ),
+				'header' => __( '<a href="#" class="js-show-hours-scheme">Learn more about time formatting</a>' ),
 				'footer' => ''
 			)
 		) );
@@ -185,10 +190,6 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		echo $args['after_widget'];
 	}
 
-	public static function registerWidget() {
-		register_widget( 'OpenOverview_Widget' );
-	}
-
 	/**
 	 * Sanitize widget form values as they are saved.
 	 *
@@ -212,3 +213,5 @@ class OpenOverview_Widget extends OpenAbstract_Widget {
 		return $instance;
 	}
 }
+
+endif;

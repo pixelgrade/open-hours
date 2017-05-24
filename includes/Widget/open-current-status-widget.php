@@ -1,6 +1,11 @@
 <?php
 
-require_once( plugin_dir_path( __FILE__ ) . 'abstract-widget.php' );
+// Make sure the base widget class is loaded
+if ( ! class_exists( 'OpenAbstract_Widget' ) ) {
+	require_once( 'abstract-widget.php' );
+}
+
+if ( ! class_exists( 'OpenCurrentStatus_Widget' ) ) :
 
 class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 
@@ -71,7 +76,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'caption' => __( 'Title foot note', 'open_hours' ),
 			'notes'   => array(
 				'header' => 'Write the "Open" and "Closed" messages using the tags displayed below.',
-				'footer' => _( 'See <a href="#" class="js-show-hours-scheme">available tags</a> scheme.' )
+				'footer' => __( 'See <a href="#" class="js-show-hours-scheme">available tags</a> scheme.' )
 			)
 		) );
 
@@ -120,7 +125,7 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 			'type'    => 'description',
 			'caption' => __( 'TimeFormat Footnote', 'open_hours' ),
 			'notes'   => array(
-				'header' => _( '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">Learn more about time formatting</a>' ),
+				'header' => __( '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">Learn more about time formatting</a>' ),
 				'footer' => ''
 			)
 		) );
@@ -152,10 +157,6 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 		echo $args['after_widget'];
 	}
 
-	public static function registerWidget() {
-		register_widget( 'OpenCurrentStatus_Widget' );
-	}
-
 	public function update( $new_instance, $old_instance ) {
 		$instance                = array();
 		$instance['title']       = ( ! empty( $new_instance['title'] ) ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
@@ -168,3 +169,5 @@ class OpenCurrentStatus_Widget extends OpenAbstract_Widget {
 	}
 
 }
+
+endif;

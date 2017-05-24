@@ -2,6 +2,37 @@
 
 class OpenPlugin {
 
+	protected static $_instance = null; //hold our instance
+
+	/**
+	 * The plugin version number.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.4
+	 */
+	public $_version;
+
+	/**
+	 * The main plugin file.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.4
+	 */
+	public $file;
+
+	public $plugin_basepath = null;
+	public $plugin_baseuri = null;
+
+	/**
+	 * Shortcodes class object
+	 * @var Pix_Open_Shortcodes
+	 * @access  public
+	 * @since   1.0.4
+	 */
+	public $shortcodes = null;
+
+	protected $base_url = null;
+
 	/**
 	 * The unique identifier of this plugin.
 	 *
@@ -11,14 +42,6 @@ class OpenPlugin {
 	 */
 	protected $plugin_name;
 
-	/**
-	 * The current version of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string $version The current version of the plugin.
-	 */
-	protected $plugin_version;
 
 	private $widget_ids = array();
 
@@ -30,11 +53,23 @@ class OpenPlugin {
 	 * the public-facing side of the site.
 	 *
 	 * @since    1.0.0
+	 *
+	 * @param string $file
+	 * @param string $version
 	 */
-	public function __construct( $file, $version ) {
+	public function __construct( $file, $version = '1.0.0' ) {
+
+		//the main plugin file (the one that loads all this)
+		$this->file = $file;
+		//the current plugin version
+		$this->_version = $version;
+
+		//setup the helper variables for easily retrieving PATHS and URLS everywhere (these are already trailingslashit)
+		$this->plugin_basepath = plugin_dir_path( $file );
+		$this->plugin_baseuri  = plugin_dir_url( $file );
+		$this->base_url  = home_url();
 
 		$this->plugin_name = 'open';
-		$this->version     = $version;
 
 		$this->define_hooks();
 	}
@@ -52,12 +87,14 @@ class OpenPlugin {
 		add_action( 'admin_init', array( $this, 'enqueue_styles' ) );
 
 		// Add this as shortcode
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
-		$shortcodes = new Pix_Open_Shortcodes();
+		require_once $this->plugin_basepath . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
+		if ( is_null( $this->shortcodes ) ) {
+			$this->shortcodes = new Pix_Open_Shortcodes( $this );
+		}
 
-		add_shortcode( 'open-hours-overview', array( $shortcodes, 'add_open_overview_shortcodes' ) );
-		add_shortcode( 'open-time-shortcode', array( $shortcodes, 'add_open_time_shortcode' ) );
-		add_shortcode( 'open-hours-current-status', array( $shortcodes, 'add_current_status_shortcode' ) );
+		add_shortcode( 'open-hours-overview', array( $this->shortcodes, 'add_open_overview_shortcodes' ) );
+		add_shortcode( 'open-time-shortcode', array( $this->shortcodes, 'add_open_time_shortcode' ) );
+		add_shortcode( 'open-hours-current-status', array( $this->shortcodes, 'add_current_status_shortcode' ) );
 
 	}
 
@@ -66,19 +103,19 @@ class OpenPlugin {
 	 */
 	public function enqueue_customizer_control_scripts() {
 		if ( $this->is_customizer_control() ) {
-			wp_enqueue_script( 'open-customizer-control', plugin_dir_url( __FILE__ ) . 'js/open-customizer-control.js', array(
+			wp_enqueue_script( 'open-customizer-control', $this->plugin_baseuri . 'js/open-customizer-control.js', array(
 				'jquery',
 				'wp-util'
-			), $this->plugin_version, true );
-			wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+			), $this->_version, true );
+			wp_enqueue_script( 'hour-parser', $this->plugin_baseuri . 'js/HoursParser.js' );
 		}
 
-		wp_enqueue_script( 'open-customizer-select2', plugin_dir_url( __FILE__ ) . 'js/jquery.autocomplete.min.js', array(
+		wp_enqueue_script( 'open-customizer-select2', $this->plugin_baseuri . 'js/jquery.autocomplete.min.js', array(
 			'jquery',
-		), $this->plugin_version, true );
+		), $this->_version, true );
 
 		// Load only if we are on the widgets page or in the customizer
-		wp_enqueue_script( 'open-select-autocomplete', plugin_dir_url( __FILE__ ) . 'js/open-select-autocomplete.js' );
+		wp_enqueue_script( 'open-select-autocomplete', $this->plugin_baseuri . 'js/open-select-autocomplete.js' );
 
 		setlocale( LC_ALL, get_locale() );
 		$this->localize_control_js_data();
@@ -88,11 +125,11 @@ class OpenPlugin {
 	 * Enqueue live preview scripts
 	 */
 	public function enqueue_customizer_preview_scripts() {
-		wp_enqueue_script( 'open-customizer-preview', plugin_dir_url( __FILE__ ) . 'js/open-customizer-preview.js', array(
+		wp_enqueue_script( 'open-customizer-preview', $this->plugin_baseuri . 'js/open-customizer-preview.js', array(
 			'jquery',
 			'wp-util'
-		), $this->plugin_version, true );
-		wp_enqueue_script( 'hour-parser', plugin_dir_url( __FILE__ ) . 'js/HoursParser.js' );
+		), $this->_version, true );
+		wp_enqueue_script( 'hour-parser', $this->plugin_baseuri. 'js/HoursParser.js' );
 
 		$this->localize_preview_js_data();
 	}
@@ -103,7 +140,7 @@ class OpenPlugin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/open.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, $this->plugin_baseuri . 'css/open.css', array(), $this->_version, 'all' );
 	}
 
 	/**
@@ -111,8 +148,8 @@ class OpenPlugin {
 	 * Register the Overview section
 	 */
 	function register_opening_hours_main_section( $wp_customize ) {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Control/class-Pix_Open_Customize_Overview_Control.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Control/class-Pix_Open_Customize_Textarea_Control.php';
+		require_once $this->plugin_basepath . 'includes/Control/class-Pix_Open_Customize_Overview_Control.php';
+		require_once $this->plugin_basepath . 'includes/Control/class-Pix_Open_Customize_Textarea_Control.php';
 
 		// Add our section to the customizer
 		$wp_customize->add_section( 'open_hours_overview_section', array(
@@ -164,11 +201,10 @@ class OpenPlugin {
 	 * Register the Open Current Status Widget
 	 */
 	public function register_widgets() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-current-status-widget.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/Widget/open-overview-widget.php';
-
-		OpenCurrentStatus_Widget::registerWidget();
-		OpenOverview_Widget::registerWidget();
+		require_once $this->plugin_basepath . 'includes/Widget/open-current-status-widget.php';
+		register_widget( 'OpenCurrentStatus_Widget' );
+		require_once $this->plugin_basepath . 'includes/Widget/open-overview-widget.php';
+		register_widget( 'OpenOverview_Widget' );
 	}
 
 	/**
@@ -213,7 +249,6 @@ class OpenPlugin {
 	 * @param $widget_class
 	 * @param $wp_customize
 	 *
-	 * @return string
 	 */
 	function _create_customizer_widget_ids( $widget_class ) {
 		global $wp_customize;
@@ -259,5 +294,47 @@ class OpenPlugin {
 
 		return false;
 	}
+
+	/**
+	 * Main OpenPlugin Instance
+	 *
+	 * Ensures only one instance of OpenPlugin is loaded or can be loaded.
+	 *
+	 * @since  1.0.0
+	 * @static
+	 * @param string $file    File.
+	 * @param string $version Version.
+	 *
+	 * @see    OpenPlugin()
+	 * @return object Main OpenPlugin instance
+	 */
+	public static function instance( $file = '', $version = '1.0.0' ) {
+
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self( $file, $version );
+		}
+		return self::$_instance;
+	} // End instance ()
+
+	/**
+	 * Cloning is forbidden.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __clone() {
+
+		_doing_it_wrong( __FUNCTION__,esc_html( __( 'Cheatin&#8217; huh?' ) ), esc_html( $this->_version ) );
+	} // End __clone ()
+
+	/**
+	 * Unserializing instances of this class is forbidden.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __wakeup() {
+
+		_doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?' ) ),  esc_html( $this->_version ) );
+	} // End __wakeup ()
+
 
 }
