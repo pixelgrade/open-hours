@@ -12,6 +12,7 @@ Description: An easy to use opening hours WordPress plugin manager for any kind 
 Author: pixelgrade
 Version: 1.0.4
 Author URI: https://pixelgrade.com
+Text Domain: open-hours
 */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );

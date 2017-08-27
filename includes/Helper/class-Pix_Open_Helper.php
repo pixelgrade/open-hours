@@ -126,7 +126,7 @@ class Pix_Open_Helper {
 				$response = current_time( $time_format );
 				break;
 			case 'today':
-				$response = date( 'l', strtotime( "Sunday + {$dw} days" ) );
+				$response = ucfirst ( date_i18n( 'l', strtotime( "Sunday + {$dw} days" ) ) );
 				break;
 			case 'today-opening-time':
 				$today_interval = $this->_get_interval( $schedule, $this->current_day );
@@ -150,7 +150,7 @@ class Pix_Open_Helper {
 				$today         = $this->get_current_day( $dw );
 				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
-				$response      = date( 'l', strtotime( "Sunday + {$key[0]} days" ) );
+				$response      = ucfirst ( date_i18n( 'l', strtotime( "Sunday + {$key[0]} days" ) ) );
 				break;
 			case 'next-opening-time':
 				$today         = $this->get_current_day( $dw );
