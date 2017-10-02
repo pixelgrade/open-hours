@@ -131,19 +131,19 @@ class Pix_Open_Helper {
 			case 'today-opening-time':
 				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
-					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format );
+					$response = $this->_parse_hours( preg_replace( '/^\+/', '', $today_interval[0]['start'] ), $time_format );
 				}
 				break;
 			case 'today-closing-time':
 				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
-					$response = $this->_parse_hours( $today_interval[0]['end'], $time_format );
+					$response = $this->_parse_hours( preg_replace( '/^\+/', '', $today_interval[0]['end'] ), $time_format );
 				}
 				break;
 			case 'today-timeframe':
 				$today_interval = $this->_get_interval( $schedule, $this->current_day );
 				if ( $today_interval ) {
-					$response = $this->_parse_hours( $today_interval[0]['start'], $time_format ) . ' - ' . $this->_parse_hours( $today_interval[0]['end'], $time_format );
+					$response = $this->_parse_hours( preg_replace( '/^\+/', '', $today_interval[0]['start'] ) ) . ' - ' . $this->_parse_hours( preg_replace( '/^\+/', '', $today_interval[0]['end'] ), $time_format );
 				}
 				break;
 			case 'next-opening-day':
@@ -156,20 +156,20 @@ class Pix_Open_Helper {
 				$today         = $this->get_current_day( $dw );
 				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
-				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
+				$response      = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( preg_replace( '/^\+/', '', $next_open_day[ $key[0] ]['start'] ), $time_format ) : '';
 				break;
 			case 'next-closing-time':
 				$today         = $this->get_current_day( $dw );
 				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
-				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
+				$response      = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( preg_replace( '/^\+/', '', $next_open_day[ $key[0] ]['end'] ), $time_format ) : '';
 				break;
 			case 'next-opening-timeframe':
 				$today         = $this->get_current_day( $dw );
 				$next_open_day = $this->get_next_open_day( $today );
 				$key           = array_keys( $next_open_day );
-				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['start'], $time_format ) : '';
-				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( $next_open_day[ $key[0] ]['end'], $time_format ) : '';
+				$start         = isset( $next_open_day[ $key[0] ]['start'] ) ? $this->_parse_hours( preg_replace( '/^\+/', '', $next_open_day[ $key[0] ]['start'] ), $time_format ) : '';
+				$end           = isset( $next_open_day[ $key[0] ]['end'] ) ? $this->_parse_hours( preg_replace( '/^\+/', '', $next_open_day[ $key[0] ]['end'] ), $time_format ) : '';
 				$response      = $start . ' - ' . $end;
 				break;
 			default:
@@ -439,19 +439,26 @@ class Pix_Open_Helper {
 	 * If the current time is before today's start time - it will return yesterday
 	 */
 
-	public function get_current_day($today) {
-		$now         = current_time( 'timestamp' );
-		$current_day = date('l', $now);
-		$schedule = $this->_get_schedule_array();
-		$today = (int) $today;
+	public function get_current_day( $today ) {
+		$now             = current_time( 'timestamp' );
+		$current_day     = date( 'l', $now );
+		$current_end_day = $current_day;
+		$schedule        = $this->_get_schedule_array();
+		$today           = (int) $today;
 
 		if ( ! isset( $schedule[ $today ] ) ) {
 			// dunno what to do here
 			return $today;
 		}
 
-		$today_start = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . $schedule[ $today ]['start'] ) );
-		$today_end_time = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . $schedule[ $today ]['end'] ) );
+		if ( false !== strpos( $schedule[ $today ]['end'], '+' ) ) {
+			$current_end_day = date( 'l', $now + 86400 );
+		}
+
+		$now            = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . date( 'Hs', $now ) ) );
+		$today_start    = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_day . ' ' . $schedule[ $today ]['start'] ) );
+		$today_end_time = strtotime( preg_replace( '/^\+/', '', 'last ' . $current_end_day . ' ' . $schedule[ $today ]['end'] ) );
+
 
 		if ( $now > $today_end_time ) {
 			return $today;

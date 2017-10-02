@@ -308,7 +308,7 @@ class OpenPlugin {
 	 * @see    OpenPlugin()
 	 * @return object Main OpenPlugin instance
 	 */
-	public static function instance( $file = '', $version = '1.0.0' ) {
+	public static function instance( $file = '', $version = '1.0.5' ) {
 
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self( $file, $version );
