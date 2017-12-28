@@ -1,6 +1,6 @@
 var plugin = 'open',
-	source_SCSS = { public: './includes/scss/**/*.scss'},
-	dest_CSS = { public: './includes/css/'},
+	source_SCSS = { public: './scss/**/*.scss'},
+	dest_CSS = { public: './css/'},
 
 	gulp 		= require('gulp'),
 	sass 		= require('gulp-sass'),

@@ -10,7 +10,7 @@ li[id*=open_hours_overview] {
 
 .preview_open_widget {
     position: fixed;
-    left: 299px;
+    left: 18%;
     top: 0;
     z-index: -1;
 
@@ -33,6 +33,10 @@ li[id*=open_hours_overview] {
     &,
     * {
         box-sizing: border-box;
+    }
+
+    @media screen and (max-width: 1660px) {
+      left: 299px;
     }
 }
 

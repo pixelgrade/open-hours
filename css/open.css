@@ -6,7 +6,7 @@ li[id*=open_hours_overview] .widget-top a.widget-action:after {
 
 .preview_open_widget {
   position: fixed;
-  left: 299px;
+  left: 18%;
   top: 0;
   z-index: -1;
   padding: 30px 15px;
@@ -24,6 +24,9 @@ li[id*=open_hours_overview] .widget-top a.widget-action:after {
   .preview_open_widget,
   .preview_open_widget * {
     box-sizing: border-box; }
+  @media screen and (max-width: 1660px) {
+    .preview_open_widget {
+      left: 299px; } }
 
 .wp-full-overlay {
   transition: .2s margin ease-in-out; }
