@@ -76,15 +76,13 @@ class OpenPlugin {
 
 	public function define_hooks() {
 		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_customizer_control_scripts' ) );
-		add_action( 'customize_controls_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 
 		add_action( 'customize_preview_init', array( $this, 'enqueue_customizer_preview_scripts' ), 99999 );
 		add_action( 'customize_register', array( $this, 'register_opening_hours_main_section' ), 11 );
 
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 
-		add_action( 'admin_init', array( $this, 'enqueue_customizer_control_scripts' ) );
-		add_action( 'admin_init', array( $this, 'enqueue_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts_styles' ) );
 
 		// Add this as shortcode
 		require_once $this->plugin_basepath . 'includes/Shortcode/class-Pix_Open_Shortcodes.php';
@@ -119,6 +117,8 @@ class OpenPlugin {
 
 		setlocale( LC_ALL, get_locale() );
 		$this->localize_control_js_data();
+
+		wp_enqueue_style( $this->plugin_name, $this->plugin_baseuri . 'css/open.css', array(), $this->_version, 'all' );
 	}
 
 	/**
@@ -135,12 +135,26 @@ class OpenPlugin {
 	}
 
 	/**
-	 * Register the stylesheets for the admin area.
+	 * Register the stylesheets for the admin area, only on the widgets edit page.
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_admin_scripts_styles( $hook ) {
+		if ( 'widgets.php' != $hook ) {
+			return;
+		}
+
 		wp_enqueue_style( $this->plugin_name, $this->plugin_baseuri . 'css/open.css', array(), $this->_version, 'all' );
+
+		wp_enqueue_script( 'open-customizer-select2', $this->plugin_baseuri . 'js/jquery.autocomplete.min.js', array(
+			'jquery',
+		), $this->_version, true );
+
+		// Load only if we are on the widgets page or in the customizer
+		wp_enqueue_script( 'open-select-autocomplete', $this->plugin_baseuri . 'js/open-select-autocomplete.js' );
+
+		setlocale( LC_ALL, get_locale() );
+		$this->localize_control_js_data();
 	}
 
 	/**
