@@ -25,7 +25,7 @@ gulp.task('styles', function () {
  */
 gulp.task( 'zip', ['build'], function() {
 	return gulp.src( './' )
-		.pipe( exec( 'cd ./../; rm -rf Open-Hours-1-0-0.zip; cd ./build/; zip -r -X ./../Open-Hours-1-0-0.zip ./open-hours; cd ./../; rm -rf build' ) );
+		.pipe( exec( 'cd ./../; rm -rf Open-Hours-1-0-0.zip; cd ./build/; zip -r -X ./../Open-Hours.zip ./open-hours; cd ./../; rm -rf build' ) );
 
 } );
 
