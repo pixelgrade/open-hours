@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 function OpenPlugin() {
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/class-open.php' );
-	$instance = OpenPlugin::instance( __FILE__, '1.0.7' );
+	$instance = OpenPlugin::instance( __FILE__, '1.0.8' );
 
 	return $instance;
 }
