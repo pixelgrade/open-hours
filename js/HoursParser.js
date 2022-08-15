@@ -1,4 +1,5 @@
 // Copyright 2014 Foursquare Labs Inc. All Rights Reserved.
+// https://github.com/foursquare/hoursparser.js
 
 var fourSq = fourSq || {};
 fourSq.util = fourSq.util || {}

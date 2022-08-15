@@ -2,8 +2,8 @@
 Contributors: pixelgrade, jumparound, vlad.olaru
 Tags: restaurant, bar, business hours, currently open, date, hours, opening hours, osteria, overview, shortcode, status, table, time, widget
 Requires at least: 4.9.0
-Tested up to: 5.2.0
-Stable tag: 1.0.8
+Tested up to: 6.0
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,10 @@ Made with love by Pixelgrade!
 3. Start adding either your business' schedule or the current status of your operations through our Widgets or Shortcodes
 
 == Changelog ==
+
+= 1.0.9 =
+* Better handling of broken schedules
+* Ensure compatibility with the latest WordPress version (6.0)
 
 = 1.0.8 =
 * We did several compatibility checks with the latest WordPress releases, so everything will be working smoothly
