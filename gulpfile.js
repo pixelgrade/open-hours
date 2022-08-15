@@ -1,61 +1,71 @@
-var plugin = 'open',
-	source_SCSS = { public: './scss/**/*.scss'},
-	dest_CSS = { public: './css/'},
+var plugin = 'open-hours',
 
-	gulp 		= require('gulp'),
-	sass 		= require('gulp-sass'),
-	prefix 		= require('gulp-autoprefixer'),
-	exec 		= require('gulp-exec'),
-	del         = require('del');
+	gulp = require( 'gulp' ),
+	plugins = require( 'gulp-load-plugins' )(),
+	fs = require( 'fs' ),
+	cp = require( 'child_process' ),
+	del = require( 'del' ),
+	commandExistsSync = require('command-exists').sync;
 
-require('es6-promise').polyfill();
-
-gulp.task('styles', function () {
-	return gulp.src(source_SCSS.public)
-		.pipe(sass({'sourcemap': false, style: 'compact'}))
-		.on('error', function (e) {
-			console.log(e.message);
-		})
-		.pipe(prefix("last 1 version", "> 1%", "ie 8", "ie 7"))
-		.pipe(gulp.dest(dest_CSS.public));
-});
-
-/**
- * Create a zip archive out of the cleaned folder and delete the folder
- */
-gulp.task( 'zip', ['build'], function() {
-	return gulp.src( './' )
-		.pipe( exec( 'cd ./../; rm -rf Open-Hours-1-0-0.zip; cd ./build/; zip -r -X ./../Open-Hours.zip ./open-hours; cd ./../; rm -rf build' ) );
-
+gulp.task( 'styles', function () {
+	return gulp.src( ['scss/open.scss'] )
+		.pipe( plugins.sass( { 'sourcemap': false, style: 'compact' } ) )
+		.pipe(plugins.autoprefixer())
+		.pipe( gulp.dest( './css' ) );
 } );
 
 /**
- * Copy theme folder outside in a build folder, recreate styles before that
+ * Copy plugin folder outside in a build folder, recreate styles before that
  */
-gulp.task( 'copy-folder', function() {
-	return gulp.src( './' )
-		.pipe( exec( 'rm -Rf ./../build; mkdir -p ./../build/open-hours; cp -Rf ./* ./../build/open-hours/' ) );
+gulp.task( 'copy-folder', function () {
+	var dir = process.cwd();
+	return gulp.src( './*' )
+		.pipe( plugins.exec( 'rm -Rf ./../build; mkdir -p ./../build/' + plugin + ';', {
+			silent: true,
+			continueOnError: true // default: false
+		} ) )
+		.pipe( plugins.rsync( {
+			root: dir,
+			destination: '../build/' + plugin + '/',
+			// archive: true,
+			progress: false,
+			silent: false,
+			compress: false,
+			recursive: true,
+			emptyDirectories: true,
+			clean: true,
+			exclude: [ 'node_modules' ]
+		} ) );
 } );
 
 /**
  * Clean the folder of unneeded files and folders
  */
-gulp.task( 'build', ['copy-folder'], function() {
+gulp.task( 'remove-files', function () {
 
 	// files that should not be present in build zip
 	var files_to_remove = [
-		'**/codekit-config.json',
 		'node_modules',
+		'node-tasks',
+		'bin',
 		'tests',
 		'.travis.yml',
 		'.babelrc',
 		'.gitignore',
+		'.node-version',
+		'.npmrc',
+		'.nvmrc',
+		'.csslintrc',
+		'.eslintignore',
+		'.eslintrc',
 		'circle.yml',
 		'phpunit.xml.dist',
 		'.sass-cache',
 		'config.rb',
 		'gulpfile.js',
+		'webpack.config.js',
 		'package.json',
+		'package-lock.json',
 		'pxg.json',
 		'build',
 		'.idea',
@@ -66,30 +76,101 @@ gulp.task( 'build', ['copy-folder'], function() {
 		'**/.DS_Store',
 		'__MACOSX',
 		'**/__MACOSX',
-		'+development.rb',
-		'+production.rb',
+		'.csscomb',
+		'.csscomb.json',
+		'.codeclimate.yml',
+		'tests',
+		'circle.yml',
+		'.circleci',
+		'.labels',
+		'.jscsrc',
+		'.jshintignore',
+		'browserslist',
 		'README.md',
-		'admin/src',
-		'admin/scss',
-		'admin/js/*.map',
-		'admin/css/*.map',
-		'.labels'
 	];
 
-	files_to_remove.forEach( function( e, k ) {
-		files_to_remove[k] = '../build/open-hours/' + e;
+	files_to_remove.forEach( function ( e, k ) {
+		files_to_remove[k] = '../build/' + plugin + '/' + e;
 	} );
 
-	del.sync(files_to_remove, {force: true});
+	return del( files_to_remove, { force: true } );
 } );
 
-var sourcemaps = require('gulp-sourcemaps');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var react = require('react');
-var reactdom = require('react-dom');
-var babel = require('babelify');
+function maybeFixBuildDirPermissions ( done ) {
 
-gulp.task('react', function() { return compile(); });
+	cp.execSync( 'find ./../build -type d -exec chmod 755 {} \\;' );
+
+	return done();
+}
+
+maybeFixBuildDirPermissions.description = 'Make sure that all directories in the build directory have 755 permissions.';
+gulp.task( 'fix-build-dir-permissions', maybeFixBuildDirPermissions );
+
+function maybeFixBuildFilePermissions ( done ) {
+
+	cp.execSync( 'find ./../build -type f -exec chmod 644 {} \\;' );
+
+	return done();
+}
+
+maybeFixBuildFilePermissions.description = 'Make sure that all files in the build directory have 644 permissions.';
+gulp.task( 'fix-build-file-permissions', maybeFixBuildFilePermissions );
+
+function maybeFixIncorrectLineEndings ( done ) {
+
+	if (!commandExistsSync('dos2unix')) {
+		log.warn( 'Could not ensure that line endings are correct on the build files since you are missing the "dos2unix" utility! You should install it.' );
+		log.warn( 'However, this is not a very big deal. The build task will continue.' );
+	} else {
+		cp.execSync('find ./../build -type f -print0 | xargs -0 -n 1 -P 4 dos2unix');
+	}
+
+	return done();
+}
+
+maybeFixIncorrectLineEndings.description = 'Make sure that all line endings in the files in the build directory are UNIX line endings.';
+gulp.task( 'fix-line-endings', maybeFixIncorrectLineEndings );
+
+/**
+ * Create a zip archive out of the cleaned folder and delete the folder
+ */
+gulp.task( 'make-zip', function () {
+	var versionString = '';
+	// get plugin version from the main plugin file
+	var contents = fs.readFileSync( './' + plugin + '.php', 'utf8' );
+
+	// split it by lines
+	var lines = contents.split( /[\r\n]/ );
+
+	function checkIfVersionLine ( value, index, ar ) {
+		var myRegEx = /^[\s\*]*[Vv]ersion:/;
+		if ( myRegEx.test( value ) ) {
+			return true;
+		}
+		return false;
+	}
+
+	// apply the filter
+	var versionLine = lines.filter( checkIfVersionLine );
+
+	versionString = versionLine[0].replace( /^[\s\*]*[Vv]ersion:/, '' ).trim();
+	versionString = '-' + versionString.replace( /\./g, '-' );
+
+	return gulp.src( './' )
+		.pipe( plugins.exec( 'cd ./../; rm -rf ' + plugin[0].toUpperCase() + plugin.slice( 1 ) + '*.zip; cd ./build/; zip -r -X ./../' + plugin[0].toUpperCase() + plugin.slice( 1 ) + versionString + '.zip ./; cd ./../; rm -rf build' ) );
+
+} );
+
+function buildSequence ( cb ) {
+	return gulp.series( 'copy-folder', 'remove-files', 'fix-build-dir-permissions', 'fix-build-file-permissions', 'fix-line-endings' )( cb );
+}
+
+buildSequence.description = 'Sets up the build folder';
+gulp.task( 'build', buildSequence );
+
+function zipSequence ( cb ) {
+	return gulp.series( 'build', 'make-zip' )( cb );
+}
+
+zipSequence.description = 'Creates the zip file';
+gulp.task( 'zip', zipSequence );
