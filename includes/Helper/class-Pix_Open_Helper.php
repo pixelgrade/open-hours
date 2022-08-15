@@ -391,6 +391,9 @@ class Pix_Open_Helper {
 		}
 
 		$option = json_decode( $option, true );
+		if ( empty( $option['timeframes'] ) || ! is_array( $option['timeframes'] ) ) {
+			return false;
+		}
 
 		foreach ( $option['timeframes'] as $timeframe ) {
 			// Parse through the days and add them to our schedule_array
@@ -402,7 +405,7 @@ class Pix_Open_Helper {
 			}
 		}
 
-		// SOrt the array keys - so they're always be in order
+		// Sort the array keys - so they're always in order
 		ksort( $schedule_array, SORT_ASC );
 
 		return $schedule_array;
@@ -424,7 +427,7 @@ class Pix_Open_Helper {
 			$next_day = $today + 1;
 		}
 
-		if ( ! isset( $schedule[ $next_day ] ) ) {
+		if ( ! is_array( $schedule ) || ! isset( $schedule[ $next_day ] ) ) {
 			return $this->get_next_open_day( $next_day );
 		}
 
@@ -446,7 +449,7 @@ class Pix_Open_Helper {
 		$schedule        = $this->_get_schedule_array();
 		$today           = (int) $today;
 
-		if ( ! isset( $schedule[ $today ] ) ) {
+		if ( ! is_array( $schedule ) || ! isset( $schedule[ $today ] ) ) {
 			// dunno what to do here
 			return $today;
 		}
